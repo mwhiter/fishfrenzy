@@ -1,4 +1,4 @@
-package edu.cisc3660.lab1;
+package edu.whiter.lab1;
 
 import java.util.ArrayList;
 import java.util.Collections;
