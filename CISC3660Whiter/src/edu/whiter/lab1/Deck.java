@@ -13,12 +13,23 @@ public class Deck{
 	// Constructor
 	public Deck()
 	{
-		for(Rank r : Rank.values()){
+	}
+	
+	public void initFullDeck()
+	{
+		deck.removeAll(deck);
+		for(Rank r : Rank.values())
+		{
 			for(Suit s : Suit.values())
 			{
-				deck.add(new Card(s,r));
+				deck.add(new Card(s, r));
 			}
 		}
+	}
+	
+	public void initEmptyDeck()
+	{
+		deck.removeAll(deck);
 	}
 	
 	// Boilerplate code

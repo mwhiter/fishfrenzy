@@ -8,6 +8,11 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		lab1();
+	}
+	
+	public static void lab1()
+	{
 		// Test
 		Deck deck = new Deck();
 		
@@ -51,5 +56,11 @@ public class Main {
 			System.out.println("(" + sum_a1 + ", " + sum_a2 + ") Player 2 wins!");
 		else if(sum_a1 == sum_a2)
 			System.out.println("(" + sum_a1 + ", " + sum_a2 + ") No one wins!");
+	}
+	
+	public static void testLab1()
+	{
+		Deck deck = new Deck();
+		System.out.println(deck.toString());
 	}
 }
