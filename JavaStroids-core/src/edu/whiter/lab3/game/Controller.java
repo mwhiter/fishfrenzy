@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -18,11 +20,13 @@ public class Controller {
 	
 	ArrayList<GameObject> drawableObjects; 
 	Ship ship;
+	private float screenHeight;
 	
 	public Controller(){
 		drawableObjects = new ArrayList<GameObject>(); 
 		initShip();
 		initAsteroids(10);
+		screenHeight = Gdx.graphics.getHeight();
 	}
 	
 	private void initShip(){
@@ -50,6 +54,7 @@ public class Controller {
 	
 	public void update(){
 		processKeyboardInput();
+		processMouseInput();
 		
 		// Update Asteroids
 		for(GameObject gObg : drawableObjects){
@@ -59,6 +64,12 @@ public class Controller {
 		}
 		// Update ship
 		ship.update(Gdx.graphics.getDeltaTime());
+	}
+	
+	private void processMouseInput(){
+		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+			ship.face(new Vector2(Gdx.input.getX()-ship.sprite.getX(), -(screenHeight - Gdx.input.getY()-ship.sprite.getY())));
+		}
 	}
 	
 	private void processKeyboardInput(){
