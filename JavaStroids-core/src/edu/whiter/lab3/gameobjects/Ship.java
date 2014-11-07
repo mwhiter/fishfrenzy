@@ -7,6 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Ship extends GameObject implements Updatable{
 	
+	private final float MIN_VELOCITY = 20;
+	
+	private Vector2 velocity;
 	private Vector2 direction;
 	private Vector2 targetDirection;
 	
@@ -16,6 +19,7 @@ public class Ship extends GameObject implements Updatable{
 		sprite.setPosition(x, y);
 		direction = new Vector2(0, -1);
 		targetDirection = new Vector2(0, -1);
+		velocity = new Vector2(0, MIN_VELOCITY);
 		setIsDrawable(true);
 	}
 	
@@ -33,13 +37,16 @@ public class Ship extends GameObject implements Updatable{
 		if(direction.crs(n) > 0.0f)
 			deg = -deg;
 		
-		direction.rotate(-1.0f * (float)deg);	// for some reason this vector needs to rotate opposite otherwise it picks the completely wrong spot to rotate to.
+		direction.rotate(-(float)deg);	// for some reason this vector needs to rotate opposite otherwise it picks the completely wrong spot to rotate to.
 		sprite.rotate((float)deg);
+		
+		sprite.translate(velocity.x * Gdx.graphics.getDeltaTime(), -velocity.y * Gdx.graphics.getDeltaTime());
+		if(velocity.len() > MIN_VELOCITY) velocity.scl(1-Gdx.graphics.getDeltaTime());
 	}
 
 	public void moveForward(float deltaTime) {
-//		Student, your code goes here		
-		
+		velocity.x = velocity.x + direction.x * velocity.len() * Gdx.graphics.getDeltaTime() * 2;
+		velocity.y = velocity.y + direction.y * velocity.len() * Gdx.graphics.getDeltaTime() * 2;
 	}
 
 }
