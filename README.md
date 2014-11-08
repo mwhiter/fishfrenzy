@@ -6,4 +6,4 @@ Group Members:
 
 - Michael Whiter (mjwhiter@hotmail.com)
 - Abraham Husney (abiehusney15@gmail.com)
-- Christopher Mailloux (???)
+- Christopher Mailloux (flare13189@yahoo.com)
