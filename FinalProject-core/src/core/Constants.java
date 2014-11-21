@@ -1,5 +1,5 @@
 package core;
 
 public class Constants {
-	public final static int TILE_SIZE = 16;
+	public final static int TILE_SIZE = 64;
 }

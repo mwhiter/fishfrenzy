@@ -1,6 +1,9 @@
 package environment;
 
 import core.Constants;
+import com.badlogic.gdx.graphics.Texture;
+
+import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class Grid {
 	private int width;
@@ -9,6 +12,8 @@ public class Grid {
 	
 	public Grid(int width, int height)
 	{
+		this.width =  width;
+		this.height = height;
 		grid = new Tile[width][height];
 		
 		init();
@@ -22,18 +27,18 @@ public class Grid {
 		{
 			for(int j = 0; j < height; j++)
 			{
-				grid[width][height] = new Tile(i, j);
+				grid[i][j] = new Tile(new Texture("tile00.png"), i, j);
 			}
 		}
 	}
 	
-	public void draw()
+	public void draw(Batch spriteBatch)
 	{
 		for(int i = 0; i < width; i++)
 		{
 			for(int j = 0; j < height; j++)
 			{
-				grid[i][j].draw();
+				grid[i][j].sprite.draw(spriteBatch);
 			}
 		}
 	}

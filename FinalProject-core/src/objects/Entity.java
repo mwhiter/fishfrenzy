@@ -27,10 +27,4 @@ public class Entity extends GameObject
 		sprite.setX(sprite.getX() + velocity.x * Gdx.graphics.getDeltaTime());
 		sprite.setY(sprite.getY() + velocity.y * Gdx.graphics.getDeltaTime());
 	}
-	
-	@Override
-	public void draw()
-	{
-		
-	}
 }
