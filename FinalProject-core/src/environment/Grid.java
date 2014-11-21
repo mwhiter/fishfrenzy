@@ -1,7 +1,7 @@
 package environment;
 
 import core.Constants;
-import com.badlogic.gdx.graphics.Texture;
+import environment.TileType;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 
@@ -27,7 +27,14 @@ public class Grid {
 		{
 			for(int j = 0; j < height; j++)
 			{
-				grid[i][j] = new Tile(new Texture("tile00.png"), i, j);
+				// Pre-defined constants for now.
+				// Obviously, we need to change this so the grid is defined in a file.
+				TileType eTileType = TileType.TILE_EMPTY;
+				if(i == 0 && j == 3) eTileType = TileType.TILE_PLAYER_GATE;
+				if(i == 3 && j == 3) eTileType = TileType.TILE_FISH_GATE;
+				if(i == 6 && j == 3) eTileType = TileType.TILE_PLAYER_GATE;
+				
+				grid[i][j] = new Tile(eTileType, i, j);
 			}
 		}
 	}
