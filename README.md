@@ -11,3 +11,5 @@ Group Members:
 Just for reference's sake:
 
 - Michael's remote is called "finalproject"
+
+If you are getting asset errors where libgdx can't find it, it needs to be added to the Build Path. (if you download my updated changes the code should be correct). But if not, go to FinalProject-desktop, right-click Properties -> Java Build Path. Go to Source and add "FinalProject-desktop/assets".
