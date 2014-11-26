@@ -5,10 +5,17 @@ package objects;
 	// Needs to have an isHuman() flag. Because only humans will accept input from the game board
 public class Player {
 	private boolean bHuman;
+	private int iFishCaptured;	// number of fish captured
+	private int iScore;			// actual game score (could be different from fish captured
+	public static int iDirNum;
 	
+	// Constructor
 	public Player(boolean human)
 	{
 		bHuman = human;
+		iScore = 0;
+		iFishCaptured = 0;
+		iDirNum = 0;
 	}
 	
 	// What does it mean to update a Player? Run its AI (this is called once per frame)
@@ -25,4 +32,8 @@ public class Player {
 	{
 		return bHuman;
 	}
+	public static void chooseDir(int n){iDirNum  = n;}
+	
+	public int getNumFishCaptured() { return iFishCaptured; }
+	public int getScore()			{ return iScore; }
 }

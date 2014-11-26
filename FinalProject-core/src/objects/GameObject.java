@@ -13,7 +13,6 @@ public abstract class GameObject
 	
 	// Abstract methods - subclasses must implement this
 	public abstract void update(float deltaTime);
-	public abstract void draw();
 	
 	public boolean isDrawable(){
 		return bUpdatable;

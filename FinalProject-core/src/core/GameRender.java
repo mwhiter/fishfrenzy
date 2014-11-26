@@ -18,11 +18,12 @@ public class GameRender {
 	
 	public void render()
 	{
+		spriteBatch.begin();
+		
 		// Draw the grid
-		logic.getGrid().draw();
+		logic.getGrid().draw(spriteBatch);
 		
 		// Draw entities
-		spriteBatch.begin();
 		for(Entity ent : logic.getEntities()){
 			ent.sprite.draw(spriteBatch);
 		}
