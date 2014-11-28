@@ -11,14 +11,23 @@ public class Tile {
 	public Sprite sprite;
 	public TileType tileType;
 	int x, y;
+	int gridX, gridY;
 	
 	public Tile(TileType eTileType, int x, int y)
 	{
 		tileType = eTileType;
 		sprite = new Sprite(getTexture(tileType));
 		sprite.setPosition(x * Constants.TILE_SIZE, y * Constants.TILE_SIZE);
+		gridX = x; gridY=y;
 	}
+	
 	public float getTilePos() {return this.sprite.getY();}
+	
+	public void setGx(int x) {gridX = x;}
+	public void setGy(int y) {gridY = y;}
+	public int getGx() {return gridX;}
+	public int getGy() {return gridY;}
+	
 	
 	public TileType getTileType() { return tileType; }
 	
