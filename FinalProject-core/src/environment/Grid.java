@@ -6,13 +6,19 @@ import environment.TileType;
 import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class Grid {
+	// the starting X and Y locations for the grid
+	private float startX;
+	private float startY;
+	
 	private int width;
 	private int height;
 	public Tile[][] grid;
 	//static int[][][] gridInfo;
 	
-	public Grid(int width, int height)
+	public Grid(float startX, float startY, int width, int height)
 	{
+		this.startX = startX;
+		this.startY = startY;
 		this.width =  width;
 		this.height = height;
 		grid = new Tile[width][height];
@@ -38,7 +44,7 @@ public class Grid {
 				if(i == 4 && j == 4) eTileType = TileType.TILE_FISH_GATE;
 				if(i == 8 && j == 4) eTileType = TileType.TILE_PLAYER_GATE;
 				
-				grid[i][j] = new Tile(eTileType, i, j);
+				grid[i][j] = new Tile(this, eTileType, i, j);
 				//System.out.println(grid[i][j].getTilePos());
 			}
 		}
@@ -55,22 +61,35 @@ public class Grid {
 		}
 	}
 	
-	public void setTile(int i, int j, int t)
+	// Given coordinates (x, y), return the tile that we've intersected
+	public Tile getTile(float x, float y)
 	{
-		TileType eTileType = TileType.TILE_EMPTY;
-		if (t == 0) eTileType = TileType.TILE_PLAYER1_LEFT;
-		if (t == 1) eTileType = TileType.TILE_PLAYER1_RIGHT;
-		if (t == 2) eTileType = TileType.TILE_PLAYER1_UP;
-		if (t == 3) eTileType = TileType.TILE_PLAYER1_DOWN;
-		grid[i][j] = new Tile(eTileType, i, j);
+		Tile rtn = null;
+		
+		// Easy cases where we clicked out the boundaries of the grid
+		if(x < startX || x > startX + getSizeX()) return null;
+		if(y < startY || y > startY + getSizeY()) return null;
+		
+		// Find out which tile we clicked
+		int tileX = (int) ((x - startX) / Constants.TILE_SIZE);
+		int tileY = (getHeight()-1) - (int)(((y - startY) / Constants.TILE_SIZE));
+		
+		rtn = grid[tileX][tileY];
+		
+		return rtn;
 	}
-	public void removeTile (int i, int j)
+	
+	public Tile getTile(int x, int y) { return grid[x][y]; }
+	public Tile getTile(Tile tile)
 	{
-		grid[i][j] = new Tile(TileType.TILE_EMPTY, i, j);
+		if(tile == null) return null;
+		return grid[tile.getX()][tile.getY()];
 	}
 	
 	public int getWidth() 	{ return width; }
 	public int getHeight() 	{ return height; }
+	public float getStartX() { return startX; }
+	public float getStartY() { return startY; }
 	public int getSizeX()	{ return width * Constants.TILE_SIZE; }
 	public int getSizeY()	{ return height * Constants.TILE_SIZE; }
 	
