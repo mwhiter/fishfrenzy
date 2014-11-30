@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import objects.Player;
-import objects.Entity;
+import objects.GameObject;
+import objects.Fish;
 import environment.Grid;
-import environment.Tile;
 
 //HAVE TO PRESS L TO place an Arrow
 
@@ -16,8 +18,13 @@ public class GameLogic {
 	
 	Grid grid;	// todo: level class that stores a grid instead?
 	ArrayList<Player> players;
-	ArrayList<Entity> entities;
+	ArrayList<GameObject> gameObjects;
 
+	public long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
+	public long lastFishSpawnTime;		// last time a fish was spawned during this wave
+	public int fishSpawnCount;			// amount of fish we've spawned in this wave
+	public int numFishActive;			// number of fish currently active
+	
 	// Constructor
 	GameLogic()
 	{
@@ -25,8 +32,13 @@ public class GameLogic {
 		grid = new Grid(0, 0, 9, 9);
 		// create players and entities
 		players = new ArrayList<Player>();
-		entities = new ArrayList<Entity>();
+		gameObjects = new ArrayList<GameObject>();
 	
+		lastFishWaveSpawnTime = -1;
+		lastFishWaveSpawnTime = -1;
+		fishSpawnCount = 0;
+		numFishActive = 0;
+		
 		// For now, just init two players - one human, one AI
 		// it seems very wrong to send the grid inside this constructor, so todo is fix this and make grid accessible from classes
 		players.add(new Player(grid, true));
@@ -38,6 +50,8 @@ public class GameLogic {
 		processKeyboardInput();
 		processMouseInput();
 		
+		doCreateFish();
+		
 		// Update players
 		for(int i=0; i < players.size(); i++)
 		{
@@ -46,44 +60,78 @@ public class GameLogic {
 			loopPlayer.update();
 		}
 		
-		// Update the entities
-		for(int i=0; i < entities.size(); i++)
+		// Update the game objects
+		for(int i=0; i < gameObjects.size(); i++)
 		{
-			Entity loopEntity = entities.get(i);
-			if(loopEntity.isUpdatable())
+			GameObject loopObject = gameObjects.get(i);
+			if(loopObject.isUpdatable())
 			{
-				loopEntity.update(Gdx.graphics.getDeltaTime());
+				loopObject.update(Gdx.graphics.getDeltaTime());
 			}
+		}
+	}
+	
+	// Create fish. Will only run at set intervals
+	public void doCreateFish()
+	{
+		long currentTime = TimeUtils.millis();
+		
+		if(numFishActive >= Constants.MAX_NUM_ACTIVE_FISH)
+			return;
+		
+		// Wave of fish
+		if(lastFishWaveSpawnTime != -1)
+		{
+			if(currentTime - Constants.TIME_BETWEEN_FISH_WAVE_SPAWN < lastFishWaveSpawnTime)
+				return;
+		}
+		
+		// Individual fish
+		if(lastFishSpawnTime != -1)
+		{
+			if(currentTime - Constants.TIME_BETWEEN_FISH_SPAWN < lastFishSpawnTime)
+				return;
+		}
+		
+		// if we get to here, spawn a fish
+		// Right now fish spawn at a random fish spawn. We have support for multiple fish spawns if we wanted to
+		lastFishSpawnTime = TimeUtils.millis();
+		fishSpawnCount++;
+		numFishActive++;
+		gameObjects.add(new Fish(new Texture("fish.png"), grid.GetRandomFishSpawn()));
+		
+		if(fishSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
+		{
+			lastFishWaveSpawnTime = TimeUtils.millis();
+			fishSpawnCount = 0;
 		}
 	}
 	
 	public void processKeyboardInput()
 	{
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) { players.get(0).setActiveDirection(DirectionTypes.DIRECTION_LEFT); }
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) { players.get(0).setActiveDirection(DirectionTypes.DIRECTION_DOWN); }
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) { players.get(0).setActiveDirection(DirectionTypes.DIRECTION_RIGHT); }
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) { players.get(0).setActiveDirection(DirectionTypes.DIRECTION_UP); }
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_LEFT); }
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_DOWN); }
+		if (Gdx.input.isKeyPressed(Input.Keys.D)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_RIGHT); }
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_UP); }
 		
 	}
 	
 	public void processMouseInput()
 	{
 		float my, mx;
-		//if(Gdx.input.isButtonPressed(Input.Buttons.LEFT))///////////////////////////////////////
 		if (Gdx.input.isKeyJustPressed(Input.Keys.L))
 		{
 			// Store the mouse coordinates
 			mx = Gdx.input.getX();
 			my = Gdx.input.getY();
 			
-			// geid.getTile() is overloaded to accept mouse coordinates
+			// grid.getTile() is overloaded to accept mouse coordinates
 			players.get(0).assignTile(grid.getTile(mx, my));
 			return;
-
 		}
 		
 	}
 	public Grid getGrid() { return grid; }
 	public ArrayList<Player> getPlayers() { return players; }
-	public ArrayList<Entity> getEntities() { return entities; }
+	public ArrayList<GameObject> getGameObjects() { return gameObjects; }
 }

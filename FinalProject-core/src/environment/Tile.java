@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 import environment.TileType;
 import core.Constants;
-import core.DirectionTypes;
+import core.DirectionType;
 
 // A tile in the grid
 // Tiles have a tile type and a direction type
@@ -15,7 +15,7 @@ import core.DirectionTypes;
 public class Tile {
 	public Sprite sprite;
 	public TileType tileType;
-	public DirectionTypes direction;
+	public DirectionType direction;
 	
 	// Location coordinates
 	int x, y;				// grid coordinates (i.e. x = 0 is the left corner)
@@ -33,7 +33,7 @@ public class Tile {
 		real_y = grid.getStartY() + y * Constants.TILE_SIZE;
 		
 		tileType = eTileType;
-		direction = DirectionTypes.NO_DIRECTION;
+		direction = DirectionType.NO_DIRECTION;
 		sprite = new Sprite(getTexture(tileType));
 		sprite.setPosition(real_x, real_y);
 	}
@@ -44,9 +44,13 @@ public class Tile {
 	//public void setX(int x) {x = x;}
 	//public void setY(int y) {y = y;}
 	
-	public int getX() {return x;}
-	public int getY() {return y;}
-	public DirectionTypes getDirection() { return direction; }
+	public float getCenterX() { return getRealX() + Constants.TILE_SIZE / 2; }
+	public float getCenterY() { return getRealY() + Constants.TILE_SIZE / 2; }
+	public float getRealX() { return x * Constants.TILE_SIZE; }
+	public float getRealY() { return y * Constants.TILE_SIZE; }
+	public int getX() { return x; }
+	public int getY() { return y; }
+	public DirectionType getDirection() { return direction; }
 	
 	public TileType getTileType() { return tileType; }
 	
@@ -62,21 +66,22 @@ public class Tile {
 		return new Texture(("tile_empty.png"));
 	}
 	
-	public void setTileDirection(DirectionTypes eDirection)
+	public void setTileDirection(DirectionType eDirection)
 	{
 		if(tileType != TileType.TILE_EMPTY) return;
 		
 		direction = eDirection;
 
-		if(direction == DirectionTypes.NO_DIRECTION)
+		if(direction == DirectionType.NO_DIRECTION)
 			sprite.setTexture(new Texture("tile_empty.png"));
-		if(direction == DirectionTypes.DIRECTION_LEFT)
+		
+		if(direction == DirectionType.DIRECTION_LEFT)
 			sprite.setTexture(new Texture("player1_left.png"));
-		if(direction == DirectionTypes.DIRECTION_RIGHT)
+		if(direction == DirectionType.DIRECTION_RIGHT)
 			sprite.setTexture(new Texture("player1_right.png"));
-		if(direction == DirectionTypes.DIRECTION_UP)
+		if(direction == DirectionType.DIRECTION_UP)
 			sprite.setTexture(new Texture("player1_up.png"));
-		if(direction == DirectionTypes.DIRECTION_DOWN)
+		if(direction == DirectionType.DIRECTION_DOWN)
 			sprite.setTexture(new Texture("player1_down.png"));
 
 		// Player 2 stuff

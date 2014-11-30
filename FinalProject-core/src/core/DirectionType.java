@@ -1,6 +1,6 @@
 package core;
 
-public enum DirectionTypes {
+public enum DirectionType {
 	NO_DIRECTION,
 	DIRECTION_LEFT,
 	DIRECTION_UP,

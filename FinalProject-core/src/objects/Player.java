@@ -2,7 +2,7 @@ package objects;
 
 import java.util.ArrayList;
 
-import core.DirectionTypes;
+import core.DirectionType;
 import environment.Grid;
 import environment.Tile;
 
@@ -15,7 +15,7 @@ public class Player {
 	private int iFishCaptured;	// number of fish captured
 	private int iScore;			// actual game score (could be different from fish captured
 	public int tileAmmo;
-	private DirectionTypes activeDirection;
+	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
 	
 	// Constructor
@@ -26,7 +26,7 @@ public class Player {
 		iScore = 0;
 		iFishCaptured = 0;
 		tileAmmo =0;
-		activeDirection = DirectionTypes.NO_DIRECTION;
+		activeDirection = DirectionType.NO_DIRECTION;
 		tiles = new ArrayList<Tile>();
 	}
 	
@@ -56,7 +56,7 @@ public class Player {
 		// If we've reached the maximum amount of tiles we're allowed, remove the first one
 		if (tiles.size() > 2)
 	    {
-			grid.getTile(tiles.get(0)).setTileDirection(DirectionTypes.NO_DIRECTION);
+			grid.getTile(tiles.get(0)).setTileDirection(DirectionType.NO_DIRECTION);
 	     	tiles.remove(0);
 		}
 		
@@ -69,6 +69,6 @@ public class Player {
 	public int getScore()			{ return iScore; }
 	public void incTile()			{ tileAmmo ++; }
 	
-	public DirectionTypes getActiveDirection() { return activeDirection; }
-	public void setActiveDirection(DirectionTypes eDirection) { activeDirection = eDirection; }
+	public DirectionType getActiveDirection() { return activeDirection; }
+	public void setActiveDirection(DirectionType eDirection) { activeDirection = eDirection; }
 }

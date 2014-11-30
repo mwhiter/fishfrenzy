@@ -15,15 +15,15 @@ public abstract class GameObject
 	public abstract void update(float deltaTime);
 	
 	public boolean isDrawable(){
-		return bUpdatable;
-	}
-	public boolean isUpdatable(){
 		return bDrawable;
 	}
+	public boolean isUpdatable(){
+		return bUpdatable;
+	}
 	public void setDrawable(boolean val){
-		bUpdatable = val;
+		bDrawable = val;
 	}
 	public void setUpdatable(boolean val){
-		bDrawable = val;
+		bUpdatable = val;
 	}
 }

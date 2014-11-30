@@ -3,7 +3,7 @@ package core;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import core.GameLogic;
-import objects.Entity;
+import objects.GameObject;
 
 public class GameRender {
 	private SpriteBatch spriteBatch;
@@ -23,9 +23,10 @@ public class GameRender {
 		// Draw the grid
 		logic.getGrid().draw(spriteBatch);
 		
-		// Draw entities
-		for(Entity ent : logic.getEntities()){
-			ent.sprite.draw(spriteBatch);
+		// Draw game objects
+		for(GameObject obj : logic.getGameObjects()){
+			if(obj.isDrawable())
+				obj.sprite.draw(spriteBatch);;
 		}
 		spriteBatch.end();
 	}

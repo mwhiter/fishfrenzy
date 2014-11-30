@@ -1,9 +1,12 @@
 package environment;
 
+import java.util.ArrayList;
+
 import core.Constants;
 import environment.TileType;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.MathUtils;
 
 public class Grid {
 	// the starting X and Y locations for the grid
@@ -13,7 +16,8 @@ public class Grid {
 	private int width;
 	private int height;
 	public Tile[][] grid;
-	//static int[][][] gridInfo;
+	
+	private ArrayList<Tile> fishSpawns;
 	
 	public Grid(float startX, float startY, int width, int height)
 	{
@@ -22,8 +26,7 @@ public class Grid {
 		this.width =  width;
 		this.height = height;
 		grid = new Tile[width][height];
-		//gridInfo = new int [width][height][6];
-		
+		fishSpawns = new ArrayList<Tile>();
 		init();
 	}
 	
@@ -45,6 +48,8 @@ public class Grid {
 				if(i == 8 && j == 4) eTileType = TileType.TILE_PLAYER_GATE;
 				
 				grid[i][j] = new Tile(this, eTileType, i, j);
+				if(eTileType == TileType.TILE_FISH_GATE)
+					fishSpawns.add(grid[i][j]);
 				//System.out.println(grid[i][j].getTilePos());
 			}
 		}
@@ -93,9 +98,19 @@ public class Grid {
 	public int getSizeX()	{ return width * Constants.TILE_SIZE; }
 	public int getSizeY()	{ return height * Constants.TILE_SIZE; }
 	
-	//public void setTile(int n, int  x, int y)
-	//{
-	
-		
-	//}
+	/* Support for multiple fish spawns */
+	public ArrayList<Tile> GetFishSpawns() { return fishSpawns; }
+	// Get a particular fish spawn
+	public Tile GetFishSpawn(int index)
+	{
+		if(index < 0 || index >= fishSpawns.size()) return null;
+		return fishSpawns.get(index);
+	}
+	// Get a random fish spawn (out of a list of all of them)
+	public Tile GetRandomFishSpawn()
+	{
+		if(fishSpawns.size() == 0) return null;
+		int random = MathUtils.random(fishSpawns.size()-1);
+		return fishSpawns.get(random);
+	}
 }
