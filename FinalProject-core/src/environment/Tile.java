@@ -1,7 +1,10 @@
 package environment;
 
 //import com.badlogic.gdx.Gdx;
+import objects.Player;
+
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Texture;
 
 import environment.TileType;
@@ -16,6 +19,9 @@ public class Tile {
 	public Sprite sprite;
 	public TileType tileType;
 	public DirectionType direction;
+	
+	private Texture texture;
+	private TextureRegion[][] tileTextures;
 	
 	// Location coordinates
 	int x, y;				// grid coordinates (i.e. x = 0 is the left corner)
@@ -32,10 +38,27 @@ public class Tile {
 		real_x = grid.getStartX() + x * Constants.TILE_SIZE;
 		real_y = grid.getStartY() + y * Constants.TILE_SIZE;
 		
+		sprite = new Sprite();
+		sprite.setPosition(real_x, real_y);
+		
 		tileType = eTileType;
 		direction = DirectionType.NO_DIRECTION;
-		sprite = new Sprite(getTexture(tileType));
-		sprite.setPosition(real_x, real_y);
+		
+		texture = new Texture("tilesheet.png");
+		tileTextures = TextureRegion.split(texture, Constants.TILE_SIZE, Constants.TILE_SIZE);
+		
+		assignTexture(getTextureIndex(eTileType));
+	}
+	
+	// Consult tile sheet for correct index
+	private void assignTexture(int index)
+	{
+		// to-do: we need to check to make sure we don't send an invalid index here!
+		int iX = index % (texture.getWidth() / Constants.TILE_SIZE);
+		int iY = (int) index / (texture.getWidth() / Constants.TILE_SIZE);
+		
+		sprite = new Sprite(tileTextures[iY][iX]);
+		sprite.setPosition(grid.getStartX() + x * Constants.TILE_SIZE, grid.getStartY() + y * Constants.TILE_SIZE);
 	}
 	
 	public float getTilePos() {return this.sprite.getY();}
@@ -54,48 +77,55 @@ public class Tile {
 	
 	public TileType getTileType() { return tileType; }
 	
-	private Texture getTexture(TileType eType)
+	// Find the correct texture index
+	private int getTextureIndex(TileType eType)
 	{
-		if(eType == TileType.TILE_SOLID)
-			return new Texture("tile_solid.png");
-		if(eType == TileType.TILE_FISH_GATE)
-			return new Texture("tile_fish_gate.png");
-		if(eType == TileType.TILE_PLAYER_GATE)
-			return new Texture("tile_player_gate.png");
-		
-		return new Texture(("tile_empty.png"));
+		switch(eType)
+		{
+		case TILE_EMPTY: return 0;
+		case TILE_SOLID: return 1;
+		case TILE_FISH_GATE: return 2;
+		case TILE_PLAYER_GATE: return 3;
+		default: return 0;
+		}
 	}
 	
-	public void setTileDirection(DirectionType eDirection)
+	// Find the correct texture index for arrow placement
+	private int getDirectionTextureIndex(Player player, DirectionType eDirection)
+	{
+		switch(eDirection)
+		{
+		case DIRECTION_UP:
+			if(player.isHuman())
+				return 4;
+			else
+				return 8;
+		case DIRECTION_DOWN:
+			if(player.isHuman())
+				return 5;
+			else
+				return 9;
+		case DIRECTION_LEFT:
+			if(player.isHuman())
+				return 6;
+			else
+				return 10;
+		case DIRECTION_RIGHT:
+			if(player.isHuman())
+				return 7;
+			else
+				return 11;
+		default:
+			return getTextureIndex(getTileType());
+		}
+	}
+	
+	// Set the tile direction (and update it's graphics)
+	public void setTileDirection(Player player, DirectionType eDirection)
 	{
 		if(tileType != TileType.TILE_EMPTY) return;
 		
 		direction = eDirection;
-
-		if(direction == DirectionType.NO_DIRECTION)
-			sprite.setTexture(new Texture("tile_empty.png"));
-		
-		if(direction == DirectionType.DIRECTION_LEFT)
-			sprite.setTexture(new Texture("player1_left.png"));
-		if(direction == DirectionType.DIRECTION_RIGHT)
-			sprite.setTexture(new Texture("player1_right.png"));
-		if(direction == DirectionType.DIRECTION_UP)
-			sprite.setTexture(new Texture("player1_up.png"));
-		if(direction == DirectionType.DIRECTION_DOWN)
-			sprite.setTexture(new Texture("player1_down.png"));
-
-		// Player 2 stuff
-		// To-do: because we need to keep track of who actually placed the tile down!
-		// What might be useful is to have a draw() function for the tile
-		/*
-		if(direction == DirectionTypes.DIRECTION_LEFT)
-			sprite.setTexture(new Texture("player2_left.png"));
-		if(direction == DirectionTypes.DIRECTION_RIGHT)
-			sprite.setTexture(new Texture("player2_right.png"));
-		if(direction == DirectionTypes.DIRECTION_UP)
-			sprite.setTexture(new Texture("player2_up.png"));
-		if(direction == DirectionTypes.DIRECTION_DOWN)
-			sprite.setTexture(new Texture("player2_down.png"));
-		*/
+		assignTexture(getDirectionTextureIndex(player, eDirection));
 	}
 }

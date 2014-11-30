@@ -56,12 +56,12 @@ public class Player {
 		// If we've reached the maximum amount of tiles we're allowed, remove the first one
 		if (tiles.size() > 2)
 	    {
-			grid.getTile(tiles.get(0)).setTileDirection(DirectionType.NO_DIRECTION);
+			grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION);
 	     	tiles.remove(0);
 		}
 		
 		// set the tile direction and then add it to our tiles list
-		tile.setTileDirection(getActiveDirection());
+		tile.setTileDirection(this, getActiveDirection());
 		tiles.add(tile);
 	}
 	
