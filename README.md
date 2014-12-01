@@ -12,4 +12,15 @@ Just for reference's sake:
 
 - Michael's remote is called "finalproject"
 
-If you are getting asset errors where libgdx can't find it, it needs to be added to the Build Path. (if you download my updated changes the code should be correct). But if not, go to FinalProject-desktop, right-click Properties -> Java Build Path. Go to Source and add "FinalProject-desktop/assets".
+If your project can't find the assets:
+
+- Right-click "FinalProject-desktop"
+- Click "Properties"
+- Click "Java Build Path"
+- Click "Source" tab on the top
+- Select "FinalProject-desktop/assets"
+- Select "Edit" on the right side
+- Select "Browse"
+- Find the location of your FinalProject-core/assets on the local machine
+- Select it, click "Finish"
+- Make sure your FinalProject-desktop/assets is also located on the "Order and Export" list. It works fine if it is just below JRE System Library
