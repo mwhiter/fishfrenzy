@@ -59,7 +59,6 @@ public class Player {
 			grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION);
 	     	tiles.remove(0);
 		}
-		
 		// set the tile direction and then add it to our tiles list
 		tile.setTileDirection(this, getActiveDirection());
 		tiles.add(tile);
@@ -71,4 +70,5 @@ public class Player {
 	
 	public DirectionType getActiveDirection() { return activeDirection; }
 	public void setActiveDirection(DirectionType eDirection) { activeDirection = eDirection; }
+	public Grid returnUpdatedGrid(){return grid;}//////////////////////////////////////////////////////
 }

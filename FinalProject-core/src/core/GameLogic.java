@@ -50,6 +50,8 @@ public class GameLogic {
 		processKeyboardInput();
 		processMouseInput();
 		
+		
+		
 		doCreateFish();
 		
 		// Update players
@@ -58,6 +60,7 @@ public class GameLogic {
 			Player loopPlayer = players.get(i);
 			
 			loopPlayer.update();
+			grid = loopPlayer.returnUpdatedGrid();
 		}
 		
 		// Update the game objects
@@ -66,7 +69,12 @@ public class GameLogic {
 			GameObject loopObject = gameObjects.get(i);
 			if(loopObject.isUpdatable())
 			{
-				loopObject.update(Gdx.graphics.getDeltaTime());
+				if (loopObject.getFish()) // to send the grid to A Fish//////////////
+				{
+					loopObject.update(Gdx.graphics.getDeltaTime(),grid);
+				}
+				else
+				loopObject.update(Gdx.graphics.getDeltaTime());/////////////////////
 			}
 		}
 	}
@@ -99,6 +107,7 @@ public class GameLogic {
 		fishSpawnCount++;
 		numFishActive++;
 		gameObjects.add(new Fish(new Texture("fish.png"), grid.GetRandomFishSpawn()));
+		gameObjects.get(gameObjects.size()-1).setFish(); /////////////////SO it knows that the object is a fish
 		
 		if(fishSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
 		{
