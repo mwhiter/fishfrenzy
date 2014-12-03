@@ -25,7 +25,7 @@ If your project can't find the assets:
 - Select it, click "Finish"
 - Make sure your FinalProject-desktop/assets is also located on the "Order and Export" list. It works fine if it is just below JRE System Library
 
-<h1> WHEN COMMITTING: </h1>
+## WHEN COMMITTING: ##
 
 git add FinalProject-core/src
 git add FinalProject-core/assets
