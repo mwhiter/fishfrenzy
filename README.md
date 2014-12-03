@@ -24,3 +24,13 @@ If your project can't find the assets:
 - Find the location of your FinalProject-core/assets on the local machine
 - Select it, click "Finish"
 - Make sure your FinalProject-desktop/assets is also located on the "Order and Export" list. It works fine if it is just below JRE System Library
+
+<h1> WHEN COMMITTING: </h1>
+
+git add FinalProject-core/src
+git add FinalProject-core/assets
+git add FinalProject-desktop/src
+
+Should be the only things that need to be done!
+Why?
+Because incorrect commits are changing the FinalProject-desktop/.project file which is linking resources incorrectly
