@@ -4,8 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
-import environment.Grid;
-
 // Class: Entity
 // Represents an object in the game world
 	// Has both a draw and a controller
@@ -51,13 +49,6 @@ public class Entity extends GameObject
 	@Override
 	public void update(float deltaTime)
 	{
-		sprite.setX(sprite.getX() + velocity.x * deltaTime);
-		sprite.setY(sprite.getY() + velocity.y * deltaTime);
-	}
-
-	@Override
-	public void update(float deltaTime, Grid grid) {///////////////////////////////////////////
-		// TODO Auto-generated method stub
 		sprite.setX(sprite.getX() + velocity.x * deltaTime);
 		sprite.setY(sprite.getY() + velocity.y * deltaTime);
 	}

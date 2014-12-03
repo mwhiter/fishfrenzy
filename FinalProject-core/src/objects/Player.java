@@ -10,22 +10,20 @@ import environment.Tile;
 // A player in the game world.
 	// Needs to have an isHuman() flag. Because only humans will accept input from the game board
 public class Player {
-	Grid grid;					// Player accepts a pointer to grid for now (don't want to do this, would rather have GameLogic be a global accessible from any function.
 	private boolean bHuman;
 	private int iFishCaptured;	// number of fish captured
 	private int iScore;			// actual game score (could be different from fish captured
-	public int tileAmmo;
+	//public int tileAmmo;		// no idea what this does so commenting it out
 	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
 	
 	// Constructor
-	public Player(Grid grid, boolean human)
+	public Player(boolean human)
 	{
-		this.grid = grid;
 		bHuman = human;
 		iScore = 0;
 		iFishCaptured = 0;
-		tileAmmo =0;
+		//tileAmmo =0;
 		activeDirection = DirectionType.NO_DIRECTION;
 		tiles = new ArrayList<Tile>();
 	}
@@ -48,27 +46,39 @@ public class Player {
 		return bHuman;
 	}
 	
-	public void assignTile(Tile tile)
+	public void assignTile(Grid grid, Tile tile)
 	{
+		if(grid == null) return;
 		if(tile == null) return;
 		if(tile.getDirection() == getActiveDirection()) return;
 		
-		// If we've reached the maximum amount of tiles we're allowed, remove the first one
-		if (tiles.size() > 2)
-	    {
-			grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION);
-	     	tiles.remove(0);
-		}
 		// set the tile direction and then add it to our tiles list
-		tile.setTileDirection(this, getActiveDirection());
-		tiles.add(tile);
+		// will return false if direction was not assigned
+		if(tile.setTileDirection(this, getActiveDirection()))
+		{
+			// If we've reached the maximum amount of tiles we're allowed, remove the first one
+			if (tiles.size() > 2)
+		    {
+				grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION);
+		     	tiles.remove(0);
+			}
+			
+			tiles.add(tile);
+		}
+	}
+	
+	// Awards a fish to player. Set the fish to be killed next player and give him score
+	public void awardFish(Fish fish)
+	{
+		iFishCaptured++;
+		iScore++;
+		fish.setDelayedDeath(true);
 	}
 	
 	public int getNumFishCaptured() { return iFishCaptured; }
 	public int getScore()			{ return iScore; }
-	public void incTile()			{ tileAmmo ++; }
+	//public void incTile()			{ tileAmmo ++; }
 	
 	public DirectionType getActiveDirection() { return activeDirection; }
 	public void setActiveDirection(DirectionType eDirection) { activeDirection = eDirection; }
-	public Grid returnUpdatedGrid(){return grid;}//////////////////////////////////////////////////////
 }

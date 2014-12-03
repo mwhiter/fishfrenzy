@@ -19,6 +19,7 @@ public class Tile {
 	public Sprite sprite;
 	public TileType tileType;
 	public DirectionType direction;
+	public Player owner;
 	
 	private Texture texture;
 	private TextureRegion[][] tileTextures;
@@ -29,17 +30,15 @@ public class Tile {
 	
 	Grid grid;	// tiles will store a pointer to the Grid.
 	
-	public Tile(Grid grid, TileType eTileType, int x, int y)
+	public Tile(Grid grid, TileType eTileType, Player owner, int x, int y)
 	{
 		this.grid = grid;
 		this.x = x;
 		this.y = y;
+		this.owner = owner;	// can be null!!!!
 		
-		real_x = grid.getStartX() + x * Constants.TILE_SIZE;
-		real_y = grid.getStartY() + y * Constants.TILE_SIZE;
-		
-		sprite = new Sprite();
-		sprite.setPosition(real_x, real_y);
+		real_x = grid.getStartX() + (x * Constants.TILE_SIZE);
+		real_y = Constants.HEIGHT - (grid.getStartY() + (y * Constants.TILE_SIZE)) - Constants.TILE_SIZE;
 		
 		tileType = eTileType;
 		direction = DirectionType.NO_DIRECTION;
@@ -53,12 +52,12 @@ public class Tile {
 	// Consult tile sheet for correct index
 	private void assignTexture(int index)
 	{
-		// to-do: we need to check to make sure we don't send an invalid index here!
+		// TODO we need to check to make sure we don't send an invalid index here!
 		int iX = index % (texture.getWidth() / Constants.TILE_SIZE);
 		int iY = (int) index / (texture.getWidth() / Constants.TILE_SIZE);
 		
 		sprite = new Sprite(tileTextures[iY][iX]);
-		sprite.setPosition(grid.getStartX() + x * Constants.TILE_SIZE, grid.getStartY() + y * Constants.TILE_SIZE);
+		sprite.setPosition(real_x, real_y);
 	}
 	
 	public float getTilePos() {return this.sprite.getY();}
@@ -69,13 +68,17 @@ public class Tile {
 	
 	public float getCenterX() { return getRealX() + Constants.TILE_SIZE / 2; }
 	public float getCenterY() { return getRealY() + Constants.TILE_SIZE / 2; }
-	public float getRealX() { return x * Constants.TILE_SIZE; }
-	public float getRealY() { return y * Constants.TILE_SIZE; }
+	public float getRealX() { return real_x; }
+	public float getRealY() { return real_y; }
 	public int getX() { return x; }
 	public int getY() { return y; }
 	public DirectionType getDirection() { return direction; }
-	
+	// Returns the tile's owner. Can be null!
+	public Player getOwner() { return owner; }
+	public void setOwner(Player player) { owner = player; }
+	public boolean hasOwner() { return owner != null; }
 	public TileType getTileType() { return tileType; }
+	public void setTileType(TileType eNewType) { tileType = eNewType; }
 	
 	// Find the correct texture index
 	private int getTextureIndex(TileType eType)
@@ -121,11 +124,21 @@ public class Tile {
 	}
 	
 	// Set the tile direction (and update it's graphics)
-	public void setTileDirection(Player player, DirectionType eDirection)
+	public boolean setTileDirection(Player player, DirectionType eDirection)
 	{
-		if(tileType != TileType.TILE_EMPTY) return;
+		if(player == null) return false;
+		if(!canPlaceDirection()) return false;
 		
 		direction = eDirection;
 		assignTexture(getDirectionTextureIndex(player, eDirection));
+		return true;
+	}
+	
+	public boolean canPlaceDirection()
+	{
+		if(tileType != TileType.TILE_EMPTY)
+			return false;
+		
+		return true;
 	}
 }

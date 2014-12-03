@@ -2,21 +2,18 @@ package objects;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-import environment.Grid;
-
 
 public abstract class GameObject
 {
 	private boolean bUpdatable;
 	private boolean bDrawable;
-	public boolean isFish = false;
+	private boolean bDelayedDeath;
 	public Sprite sprite;
 	
 	public GameObject() {}
 	
 	// Abstract methods - subclasses must implement this
 	public abstract void update(float deltaTime);
-	public abstract void update(float deltaTime, Grid grid);
 	
 	public boolean isDrawable(){
 		return bDrawable;
@@ -24,16 +21,16 @@ public abstract class GameObject
 	public boolean isUpdatable(){
 		return bUpdatable;
 	}
+	public boolean isDelayedDeath(){
+		return bDelayedDeath;
+	}
 	public void setDrawable(boolean val){
 		bDrawable = val;
 	}
 	public void setUpdatable(boolean val){
 		bUpdatable = val;
 	}
-	public void setFish(){
-		isFish = true;
-	}
-	public boolean getFish(){
-		return isFish;
+	public void setDelayedDeath(boolean val){
+		bDelayedDeath = val;
 	}
 }

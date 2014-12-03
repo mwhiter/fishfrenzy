@@ -6,13 +6,13 @@ import core.Constants;
 import core.DirectionType;
 import environment.Tile;
 import environment.Grid;
+import environment.TileType;
 
 // Fish class. Extends the entity.
 // Fish spawn from the center and move in a certain direction.
 public class Fish extends Entity
 {
 	DirectionType direction;
-	public boolean inGrid = true;
 	
 	// Constructor
 	public Fish(Texture texture)
@@ -33,18 +33,14 @@ public class Fish extends Entity
 	
 	public void update(float deltaTime, Grid grid) // tried to send grid, but grid never updates ////////////
 	{
-		checkColl(grid);
+		collide(grid);
 		updateVelocity(deltaTime);
-		//super.update(deltaTime); //Make sure you dont check out of bounds
-		if ( this.sprite.getX() < Constants.WIDTH - 50  && this.sprite.getY() < Constants.HEIGHT - 50  )
-		{
-			super.update(deltaTime);
-		}
+		super.update(deltaTime);
 		
 	}
 
 	// Fish velocity is dependent on their direction, so update their velocity depending on their direction
-	public void  updateVelocity(float deltaTime)
+	public void updateVelocity(float deltaTime)
 	{
 		switch(direction)
 		{
@@ -67,31 +63,20 @@ public class Fish extends Entity
 		}
 		
 	}
-	public void checkColl (Grid grid)
+	
+	public void collide(Grid grid)
 	{
-		Tile temp =  grid.getTile(this.sprite.getX(),this.sprite.getY());
-		//System.out.println(this.sprite.getX() + " " + this.sprite.getY());
-		//System.out.println(temp.getX() + " " + temp.getX());
-		//Prob 1) the Fish will always say =it is at 4,4
-		//2) the tile are all the default way they are set up
-		switch(direction)
+		// getTile() works as expected now
+		// please be sure to do a null check "if(temp != null)" before doing any operations on stuff that could potentially be null
+		Tile currentTile = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
+		if(currentTile != null)
 		{
-		case DIRECTION_UP:
-			if (this.sprite.getX() < Constants.WIDTH - 50 && this.sprite.getY() < Constants.HEIGHT - 50)
+			System.out.println(currentTile.getTileType());
+			if(currentTile.getTileType() == TileType.TILE_PLAYER_GATE)
 			{
-				//if ( grid.getTile(this.sprite.getX(),this.sprite.getY()).getDirection() == DirectionType.DIRECTION_LEFT)
-				//if (temp.getDirection() == DirectionType.DIRECTION_LEFT)
-				//	this.direction = DirectionType.DIRECTION_LEFT ;
-				//if (temp.getDirection() == DirectionType.NO_DIRECTION)
-				System.out.println(temp.getTileType());
-				System.out.println(temp.getDirection());
+				if(currentTile.getOwner() != null)
+					currentTile.getOwner().awardFish(this);
 			}
-			break;
-			
-		
-		default:
-			return;
 		}
 	}
-	
 }

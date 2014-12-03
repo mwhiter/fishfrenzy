@@ -16,33 +16,37 @@ import environment.Grid;
 
 public class GameLogic {
 	
-	Grid grid;	// todo: level class that stores a grid instead?
-	ArrayList<Player> players;
-	ArrayList<GameObject> gameObjects;
-
-	public long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
-	public long lastFishSpawnTime;		// last time a fish was spawned during this wave
-	public int fishSpawnCount;			// amount of fish we've spawned in this wave
-	public int numFishActive;			// number of fish currently active
+	private Grid grid;	// todo: level class that stores a grid instead?
+	private ArrayList<Player> players;
+	private ArrayList<GameObject> gameObjects;
+	private ArrayList<Integer> deadIndices;
+	
+	private long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
+	private long lastFishSpawnTime;		// last time a fish was spawned during this wave
+	private int fishSpawnCount;			// amount of fish we've spawned in this wave
+	private int numFishActive;			// number of fish currently active
 	
 	// Constructor
 	GameLogic()
-	{
-		// create a new 7x7 grid (constructor currently handles init)
-		grid = new Grid(0, 0, 9, 9);
+	{		
 		// create players and entities
 		players = new ArrayList<Player>();
 		gameObjects = new ArrayList<GameObject>();
-	
+		
+		// class specific helper structures
+		deadIndices = new ArrayList<Integer>();
+		
+		// For now, just init two players - one human, one AI
+		players.add(new Player(true));
+		players.add(new Player(false));
+
+		// Grid actually needs to know the players now so it has to come after they're initialized
+		grid = new Grid(this, "grids/grid0.txt");
+
 		lastFishWaveSpawnTime = -1;
 		lastFishWaveSpawnTime = -1;
 		fishSpawnCount = 0;
 		numFishActive = 0;
-		
-		// For now, just init two players - one human, one AI
-		// it seems very wrong to send the grid inside this constructor, so todo is fix this and make grid accessible from classes
-		players.add(new Player(grid, true));
-		players.add(new Player(grid, false));
 	}
 	
 	public void update()
@@ -50,37 +54,54 @@ public class GameLogic {
 		processKeyboardInput();
 		processMouseInput();
 		
-		
-		
+		// Fish spawn logic - pretty basic right now
 		doCreateFish();
 		
 		// Update players
 		for(int i=0; i < players.size(); i++)
 		{
 			Player loopPlayer = players.get(i);
-			
 			loopPlayer.update();
-			grid = loopPlayer.returnUpdatedGrid();
+			//grid = loopPlayer.returnUpdatedGrid();
 		}
+		
+		deadIndices.clear();
 		
 		// Update the game objects
 		for(int i=0; i < gameObjects.size(); i++)
 		{
 			GameObject loopObject = gameObjects.get(i);
-			if(loopObject.isUpdatable())
+			
+			// Object marked for death - no processing but kill it instead
+			if(loopObject.isDelayedDeath())
 			{
-				if (loopObject.getFish()) // to send the grid to A Fish//////////////
-				{
-					loopObject.update(Gdx.graphics.getDeltaTime(),grid);
-				}
-				else
-				loopObject.update(Gdx.graphics.getDeltaTime());/////////////////////
+				deadIndices.add(i);
 			}
+			else
+			{
+				if(loopObject.isUpdatable())
+				{
+					// Update fish
+					if (loopObject instanceof Fish)
+					{
+						((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
+					}
+					// Update other objects
+					else
+						loopObject.update(Gdx.graphics.getDeltaTime());/////////////////////
+				}
+			}
+		}
+		
+		for(Integer index : deadIndices)
+		{
+			GameObject dead = gameObjects.remove((int)index);
+			dead = null;
 		}
 	}
 	
 	// Create fish. Will only run at set intervals
-	public void doCreateFish()
+	private void doCreateFish()
 	{
 		long currentTime = TimeUtils.millis();
 		
@@ -107,7 +128,6 @@ public class GameLogic {
 		fishSpawnCount++;
 		numFishActive++;
 		gameObjects.add(new Fish(new Texture("fish.png"), grid.GetRandomFishSpawn()));
-		gameObjects.get(gameObjects.size()-1).setFish(); /////////////////SO it knows that the object is a fish
 		
 		if(fishSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
 		{
@@ -116,7 +136,7 @@ public class GameLogic {
 		}
 	}
 	
-	public void processKeyboardInput()
+	private void processKeyboardInput()
 	{
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_LEFT); }
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_DOWN); }
@@ -125,7 +145,7 @@ public class GameLogic {
 		
 	}
 	
-	public void processMouseInput()
+	private void processMouseInput()
 	{
 		float my, mx;
 		if (Gdx.input.isKeyJustPressed(Input.Keys.L))
@@ -134,13 +154,18 @@ public class GameLogic {
 			mx = Gdx.input.getX();
 			my = Gdx.input.getY();
 			
-			// grid.getTile() is overloaded to accept mouse coordinates
-			players.get(0).assignTile(grid.getTile(mx, my));
+			players.get(0).assignTile(grid, grid.getTile(mx, my));
 			return;
 		}
 		
 	}
+	
 	public Grid getGrid() { return grid; }
+	public Player getPlayer(int index)
+	{
+		if(index < 0 || index >= players.size()) return null;
+		return players.get(index);
+	}
 	public ArrayList<Player> getPlayers() { return players; }
 	public ArrayList<GameObject> getGameObjects() { return gameObjects; }
 }

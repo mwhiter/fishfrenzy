@@ -1,11 +1,11 @@
 package core;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 
 // Core class
-public class Core extends ApplicationAdapter {
+public class Core extends Game {
 	// Using the same structure as JavaStroids for now, because LibGDX is relatively new...
 	private GameLogic logic;
 	private GameRender render;
