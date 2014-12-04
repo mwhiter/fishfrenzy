@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import objects.Alge;
 import objects.Player;
 import objects.GameObject;
 import objects.Fish;
@@ -26,6 +28,11 @@ public class GameLogic {
 	private int fishSpawnCount;			// amount of fish we've spawned in this wave
 	private int numFishActive;			// number of fish currently active
 	
+	private long lastAlgeWaveSpawnTime;	
+	private long lastAlgeSpawnTime;	
+	private int algeSpawnCount;
+	private int numAlgeActive;
+	
 	// Constructor
 	GameLogic()
 	{		
@@ -44,9 +51,11 @@ public class GameLogic {
 		grid = new Grid(this, "grids/grid0.txt");
 
 		lastFishWaveSpawnTime = -1;
-		lastFishWaveSpawnTime = -1;
 		fishSpawnCount = 0;
 		numFishActive = 0;
+		lastAlgeWaveSpawnTime = -1;
+		algeSpawnCount = 0;
+		numAlgeActive = 0;
 	}
 	
 	public void update()
@@ -56,6 +65,7 @@ public class GameLogic {
 		
 		// Fish spawn logic - pretty basic right now
 		doCreateFish();
+		doCreateAlge();
 		
 		// Update players
 		for(int i=0; i < players.size(); i++)
@@ -168,4 +178,41 @@ public class GameLogic {
 	}
 	public ArrayList<Player> getPlayers() { return players; }
 	public ArrayList<GameObject> getGameObjects() { return gameObjects; }
+	
+	public void doCreateAlge()
+	{
+		System.out.println(numAlgeActive);
+		long currentTime = TimeUtils.millis();
+		
+		if(numAlgeActive >= Constants.MAX_NUM_ACTIVE_FISH)
+			return;
+		
+		if(lastAlgeWaveSpawnTime != -1)
+		{
+			if(currentTime - Constants.TIME_BETWEEN_FISH_WAVE_SPAWN < lastAlgeWaveSpawnTime)
+				return;
+		}
+		
+		if(lastAlgeSpawnTime != -1)
+		{
+			if(currentTime - Constants.TIME_BETWEEN_FISH_SPAWN < lastAlgeSpawnTime)
+				return;
+		}
+		lastAlgeSpawnTime = TimeUtils.millis();
+		algeSpawnCount++;
+		numAlgeActive++;
+		float randomX = MathUtils.random(100,500);
+		float randomY = MathUtils.random(100,500);
+		gameObjects.add(new Alge(new Texture("AlgeCoin.png"), grid.getTile(randomX, randomY)));
+		//gameObjects.get(gameObjects.size()-1).setFish(); /////////////////SO it knows that the object is a fish
+		
+		if(algeSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
+		{
+			lastAlgeWaveSpawnTime = TimeUtils.millis();
+			algeSpawnCount = 0;
+		}
+	}
+	
+	
+	
 }
