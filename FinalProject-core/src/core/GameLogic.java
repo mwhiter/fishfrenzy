@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import objects.Algae;
@@ -33,6 +32,10 @@ public class GameLogic {
 	private long lastAlgaeSpawnTime;	
 	private int algaeSpawnCount;
 	private int numAlgaeActive;
+	private long lastAlgeWaveSpawnTime;	
+	private long lastAlgeSpawnTime;	
+	private int algeSpawnCount;
+	private int numAlgeActive;
 	
 	// Constructor
 	GameLogic()
@@ -54,6 +57,7 @@ public class GameLogic {
 		lastFishWaveSpawnTime = -1;
 		fishSpawnCount = 0;
 		numFishActive = 0;
+		
 		lastAlgaeWaveSpawnTime = -1;
 		algaeSpawnCount = 0;
 		numAlgaeActive = 0;

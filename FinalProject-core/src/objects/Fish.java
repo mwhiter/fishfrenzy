@@ -70,6 +70,33 @@ public class Fish extends Entity
 		}
 		
 	}
+	public void checkTile(Grid grid)
+	{
+		Tile currentTile = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
+		if(currentTile != null)
+		{
+			if (sprite.getX() <=currentTile.getCenterX() +8 && sprite.getX() >=currentTile.getCenterX() -8  && sprite.getY() <=currentTile.getCenterY() +8 && sprite.getY() >=currentTile.getCenterY() -8 )
+			{
+				if (currentTile.getDirection() == DirectionType.DIRECTION_LEFT)
+				{
+					direction = DirectionType.DIRECTION_LEFT;
+				}
+				if (currentTile.getDirection() == DirectionType.DIRECTION_RIGHT)
+				{
+					direction = DirectionType.DIRECTION_RIGHT;
+				}
+				if (currentTile.getDirection() == DirectionType.DIRECTION_UP)
+				{
+					direction = DirectionType.DIRECTION_UP;
+				}
+				if (currentTile.getDirection() == DirectionType.DIRECTION_DOWN)
+				{
+					direction = DirectionType.DIRECTION_DOWN;
+				}
+			}
+		}
+		
+	}
 	
 	// Turn toward a direction.
 	public void turn(DirectionType eTurnDirection)
@@ -106,13 +133,11 @@ public class Fish extends Entity
 		
 		//Tile currentTile = grid.getTile(sprite.getX()+midX, Constants.HEIGHT - sprite.getY()+midY); 
 		// Had prob with that if not needed then midX and midY is also unused.
-		
 		Tile currentTile = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
 		if(currentTile != null)
 		{
 			//System.out.println(currentTile.getCenterX() + " " + currentTile.getCenterY() + " " + sprite.getX()  + " "+ sprite.getY() );
-			
-			// Player gate stuff comes outside
+
 			if(currentTile.getTileType() == TileType.TILE_PLAYER_GATE)
 			{
 				if(currentTile.getOwner() != null)
