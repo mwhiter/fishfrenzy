@@ -17,9 +17,10 @@ import core.DirectionType;
 	// direction type: changes on player input, directs the entities
 public class Tile {
 	public Sprite sprite;
-	public TileType tileType;
-	public DirectionType direction;
-	public Player owner;
+	private TileType tileType;
+	private DirectionType direction;
+	private Player owner;
+	private boolean hasCoin;
 	
 	private Texture texture;
 	private TextureRegion[][] tileTextures;
@@ -36,6 +37,7 @@ public class Tile {
 		this.x = x;
 		this.y = y;
 		this.owner = owner;	// can be null!!!!
+		hasCoin = false;
 		
 		real_x = grid.getStartX() + (x * Constants.TILE_SIZE);
 		real_y = Constants.HEIGHT - (grid.getStartY() + (y * Constants.TILE_SIZE)) - Constants.TILE_SIZE;
@@ -141,4 +143,14 @@ public class Tile {
 		
 		return true;
 	}
+	
+	public boolean canSpawnCoin()
+	{
+		if(hasCoin())
+			return false;
+		return true;
+	}
+	
+	public boolean hasCoin() { return hasCoin; }
+	public void setHasCoin(boolean bVal) { hasCoin = bVal; }
 }

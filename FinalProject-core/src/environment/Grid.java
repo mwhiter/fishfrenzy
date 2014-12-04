@@ -21,12 +21,14 @@ public class Grid {
 	private int height;
 	public Tile[][] grid;
 	
+	private ArrayList<Tile> validTiles;
 	private ArrayList<Tile> fishSpawns;
 	
 	public Grid(GameLogic logic, String file_name)
 	{
 		this.logic = logic;
 		fishSpawns = new ArrayList<Tile>();
+		validTiles = new ArrayList<Tile>();
 		ReadGrid(file_name);
 	}
 	
@@ -93,6 +95,9 @@ public class Grid {
 				switch(grid[i][j].getTileType())
 				{
 				// Add the fish spawns to the array list so we can support multiple fish spawns
+				case TILE_EMPTY:
+					validTiles.add(grid[i][j]);
+					break;
 				case TILE_FISH_GATE:
 					fishSpawns.add(grid[i][j]);
 					break;
@@ -156,7 +161,14 @@ public class Grid {
 		return rtn;
 	}
 	
-	public Tile getTile(int x, int y) { return grid[x][y]; }
+	public Tile getTile(int x, int y)
+	{
+		if(x < 0 || x >= width || y < 0 || y >= height)
+		{
+			return null;
+		}
+		return grid[x][y];
+	}
 	public Tile getTile(Tile tile)
 	{
 		if(tile == null) return null;
@@ -184,5 +196,13 @@ public class Grid {
 		if(fishSpawns.size() == 0) return null;
 		int random = MathUtils.random(fishSpawns.size()-1);
 		return fishSpawns.get(random);
+	}
+	
+	public ArrayList<Tile> GetValidTiles() { return validTiles; }
+	public Tile GetRandomValidTile()
+	{
+		if(validTiles.size() == 0) return null;
+		int random = MathUtils.random(validTiles.size()-1);
+		return validTiles.get(random);
 	}
 }
