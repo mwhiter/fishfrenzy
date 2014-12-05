@@ -38,7 +38,6 @@ public class Grid {
 	{
 		FileHandle handle = Gdx.files.internal(file_name);
 		String text = handle.readString();
-		System.out.println(text);
 		
 		int tilesProcessed = 0;
 		for(int i = 0; i < text.length(); i++)
@@ -137,7 +136,7 @@ public class Grid {
 		{
 			for(int j = 0; j < height; j++)
 			{
-				grid[i][j].sprite.draw(spriteBatch);
+				grid[i][j].draw(spriteBatch);
 			}
 		}
 	}

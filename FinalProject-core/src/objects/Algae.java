@@ -15,22 +15,20 @@ public class Algae extends Entity
 		super(texture);
 		init();
 	}
-	public Algae(Texture texture, Tile spawn)
+	public Algae(Tile spawn)
 	{
-		super(texture, spawn.getCenterX(), spawn.getCenterY());
-		spawn.setHasCoin(true);
+		super(new Texture("AlgeCoin.png"), spawn.getCenterX(), spawn.getCenterY());
 		init();
 	}
 	
 	private void init()
 	{
-
+		setUpdatable(false);
 	}
 	
 	public void update(float deltaTime)
 	{
-		super.update(deltaTime);
-		
+		super.update(deltaTime);	
 	}
 
 	

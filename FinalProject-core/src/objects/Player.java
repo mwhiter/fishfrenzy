@@ -11,19 +11,24 @@ import environment.Tile;
 	// Needs to have an isHuman() flag. Because only humans will accept input from the game board
 public class Player {
 	private boolean bHuman;
+	private int id;
 	private int iFishCaptured;	// number of fish captured
 	private int iScore;			// actual game score (could be different from fish captured
-	//public int tileAmmo;		// no idea what this does so commenting it out
+	private int iCoins;			// number of coins we've collected
+	
 	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
 	
 	// Constructor
-	public Player(boolean human)
+	public Player(int id, boolean bHuman)
 	{
-		bHuman = human;
+		this.id = id;
+		this.bHuman = bHuman;
+		
 		iScore = 0;
 		iFishCaptured = 0;
-		//tileAmmo =0;
+		iCoins = 0;
+				
 		activeDirection = DirectionType.NO_DIRECTION;
 		tiles = new ArrayList<Tile>();
 	}
@@ -72,11 +77,20 @@ public class Player {
 	{
 		iFishCaptured++;
 		iScore++;
+		
+		System.out.println("Player " + id + " captured a fish (coin: " + fish.isHasCoin() + ")");
+		
+		if(fish.isHasCoin())
+		{
+			iCoins++;
+		}
+		
 		fish.setDelayedDeath(true);
 	}
 	
 	public int getNumFishCaptured() { return iFishCaptured; }
 	public int getScore()			{ return iScore; }
+	public int getCoins()			{ return iCoins; }
 	//public void incTile()			{ tileAmmo ++; }
 	
 	public DirectionType getActiveDirection() { return activeDirection; }

@@ -12,8 +12,8 @@ import environment.TileType;
 // Fish spawn from the center and move in a certain direction.
 public class Fish extends Entity
 {
-	int midX = 0, midY = 32;
 	DirectionType direction;
+	private boolean hasCoin;
 	
 	// Constructor
 	public Fish(Texture texture)
@@ -30,7 +30,11 @@ public class Fish extends Entity
 	private void init()
 	{
 		direction = DirectionType.DIRECTION_UP;
+		hasCoin = false;
 	}
+	
+	public boolean isHasCoin() { return hasCoin; }
+	public void setHasCoin(boolean bVal) { hasCoin = bVal; }
 	
 	public void update(float deltaTime, Grid grid) // tried to send grid, but grid never updates ////////////
 	{
@@ -137,12 +141,6 @@ public class Fish extends Entity
 		if(currentTile != null)
 		{
 			//System.out.println(currentTile.getCenterX() + " " + currentTile.getCenterY() + " " + sprite.getX()  + " "+ sprite.getY() );
-
-			if(currentTile.getTileType() == TileType.TILE_PLAYER_GATE)
-			{
-				if(currentTile.getOwner() != null)
-					currentTile.getOwner().awardFish(this);
-			}
 			
 			// If we're near the center of the tile...
 			if (	
@@ -152,6 +150,23 @@ public class Fish extends Entity
 					sprite.getY() + sprite.getHeight()/2 <= currentTile.getCenterY() + Constants.TILE_COLLIDE_BOX
 				)
 			{
+				// If we hit a player gate tile, award that fish to the player
+				if(currentTile.getTileType() == TileType.TILE_PLAYER_GATE)
+				{
+					if(currentTile.getOwner() != null)
+					{
+						currentTile.getOwner().awardFish(this);
+						return;
+					}
+				}
+				
+				// If the current tile has a coin, this fish picks up the coin
+				if(currentTile.hasCoin())
+				{
+					currentTile.removeCoin();
+					setHasCoin(true);
+				}
+				
 				// If the current tile has a direction, go through that direction.
 				if(currentTile.getDirection() != DirectionType.NO_DIRECTION)
 				{

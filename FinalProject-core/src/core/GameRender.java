@@ -10,7 +10,7 @@ public class GameRender {
 	private GameLogic logic;
 	
 	// Constructor
-	GameRender(GameLogic g)
+	public GameRender(GameLogic g)
 	{
 		logic = g;
 		spriteBatch = new SpriteBatch(); 

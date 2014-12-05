@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import objects.Algae;
 import objects.Player;
 import objects.GameObject;
 import objects.Fish;
@@ -32,13 +31,9 @@ public class GameLogic {
 	private long lastAlgaeSpawnTime;	
 	private int algaeSpawnCount;
 	private int numAlgaeActive;
-	private long lastAlgeWaveSpawnTime;	
-	private long lastAlgeSpawnTime;	
-	private int algeSpawnCount;
-	private int numAlgeActive;
 	
 	// Constructor
-	GameLogic()
+	public GameLogic()
 	{		
 		// create players and entities
 		players = new ArrayList<Player>();
@@ -48,8 +43,8 @@ public class GameLogic {
 		deadIndices = new ArrayList<Integer>();
 		
 		// For now, just init two players - one human, one AI
-		players.add(new Player(true));
-		players.add(new Player(false));
+		players.add(new Player(0, true));
+		players.add(new Player(1, false));
 
 		// Grid actually needs to know the players now so it has to come after they're initialized
 		grid = new Grid(this, "grids/grid0.txt");
@@ -104,13 +99,14 @@ public class GameLogic {
 					}
 					// Update other objects
 					else
-						loopObject.update(Gdx.graphics.getDeltaTime());/////////////////////
+						loopObject.update(Gdx.graphics.getDeltaTime());
 				}
 			}
 		}
 		
 		for(Integer index : deadIndices)
 		{
+			@SuppressWarnings("unused")
 			GameObject dead = gameObjects.remove((int)index);
 			dead = null;
 		}
@@ -217,7 +213,7 @@ public class GameLogic {
 			}
 		}
 		
-		gameObjects.add(new Algae(new Texture("AlgeCoin.png"), spawnTile));
+		spawnTile.createCoin();
 		
 		if(algaeSpawnCount >= Constants.COIN_SPAWN_WAVE_SIZE)
 		{

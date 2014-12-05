@@ -1,8 +1,10 @@
 package environment;
 
 //import com.badlogic.gdx.Gdx;
+import objects.Algae;
 import objects.Player;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.Texture;
@@ -20,7 +22,8 @@ public class Tile {
 	private TileType tileType;
 	private DirectionType direction;
 	private Player owner;
-	private boolean hasCoin;
+	
+	private Algae coin;
 	
 	private Texture texture;
 	private TextureRegion[][] tileTextures;
@@ -37,7 +40,7 @@ public class Tile {
 		this.x = x;
 		this.y = y;
 		this.owner = owner;	// can be null!!!!
-		hasCoin = false;
+		coin = null;
 		
 		real_x = grid.getStartX() + (x * Constants.TILE_SIZE);
 		real_y = Constants.HEIGHT - (grid.getStartY() + (y * Constants.TILE_SIZE)) - Constants.TILE_SIZE;
@@ -49,6 +52,13 @@ public class Tile {
 		tileTextures = TextureRegion.split(texture, Constants.TILE_SIZE, Constants.TILE_SIZE);
 		
 		assignTexture(getTextureIndex(eTileType));
+	}
+	
+	public void draw(Batch spriteBatch)
+	{
+		sprite.draw(spriteBatch);
+		if(hasCoin())
+			coin.sprite.draw(spriteBatch);
 	}
 	
 	// Consult tile sheet for correct index
@@ -151,6 +161,17 @@ public class Tile {
 		return true;
 	}
 	
-	public boolean hasCoin() { return hasCoin; }
-	public void setHasCoin(boolean bVal) { hasCoin = bVal; }
+	public boolean hasCoin() { return (coin != null); }
+	public Algae getCoin() { return coin; }
+	public void createCoin()
+	{
+		if(hasCoin()) return;
+		
+		coin = new Algae(this);
+	}
+	public void removeCoin()
+	{
+		coin.setDelayedDeath(true);
+		coin = null;
+	}
 }
