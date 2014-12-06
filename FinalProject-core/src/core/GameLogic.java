@@ -139,7 +139,7 @@ public class GameLogic {
 		lastFishSpawnTime = TimeUtils.millis();
 		fishSpawnCount++;
 		numFishActive++;
-		gameObjects.add(new Fish(new Texture("fish.png"), grid.GetRandomFishSpawn()));
+		gameObjects.add(new Fish(new Texture("objects/fish.png"), grid.GetRandomFishSpawn()));
 		
 		if(fishSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
 		{

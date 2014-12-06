@@ -10,14 +10,10 @@ public class Algae extends Entity
 	public boolean inGrid = true;
 	
 	// Constructor
-	public Algae(Texture texture)
-	{
-		super(texture);
-		init();
-	}
 	public Algae(Tile spawn)
 	{
-		super(new Texture("AlgeCoin.png"), spawn.getCenterX(), spawn.getCenterY());
+		super(new Texture("objects/coin.png"), spawn.getCenterX(), spawn.getCenterY());
+		
 		init();
 	}
 	

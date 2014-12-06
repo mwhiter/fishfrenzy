@@ -14,13 +14,13 @@ import core.Core;
 import ui.CallbackFunction;
 import ui.UIElement;
 
-public class MainMenuScreen implements Screen, InputProcessor {
+public class OptionsScreen implements Screen, InputProcessor {
 	Core game;
 	private SpriteBatch spriteBatch;
 	private Texture background;
 	private ArrayList<UIElement> ui_elements;
 	
-	public MainMenuScreen(Core game)
+	public OptionsScreen(Core game)
 	{
 		super();
 		this.game = game;
@@ -32,37 +32,23 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	
 	private void InitMenuButtons()
 	{
-		ui_elements.add(new UIElement("Start Game!", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 0, 140, 48));	// Start Game
-		ui_elements.add(new UIElement("Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));	// Options
-		ui_elements.add(new UIElement("Exit", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));	// End Game
+		ui_elements.add(new UIElement("Unused", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));
+		ui_elements.add(new UIElement("Leave Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));		// Leave Options
 		
-		UIElement startGame = ui_elements.get(0);
-		UIElement options = ui_elements.get(1);
-		UIElement endGame = ui_elements.get(2);
+		UIElement unused = ui_elements.get(0);
+		UIElement leaveOptions = ui_elements.get(1);
 		
-		// Start Game button
-		startGame.setCallbackFunction(new CallbackFunction() {
+		unused.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new GameScreen(game));
-				dispose();
 			}
 		});
 		
-		// Options button
-		options.setCallbackFunction(new CallbackFunction() {
+		leaveOptions.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new OptionsScreen(game));
+				game.setScreen(new MainMenuScreen(game));
 				dispose();
-			}
-		});
-		
-		// End Game button
-		endGame.setCallbackFunction(new CallbackFunction() {
-			public void func()
-			{
-				
 			}
 		});
 	}

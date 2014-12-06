@@ -139,17 +139,62 @@ public class Tile {
 	public boolean setTileDirection(Player player, DirectionType eDirection)
 	{
 		if(player == null) return false;
-		if(!canPlaceDirection()) return false;
+		if(!canPlaceDirection(eDirection)) return false;
 		
 		direction = eDirection;
 		assignTexture(getDirectionTextureIndex(player, eDirection));
 		return true;
 	}
 	
-	public boolean canPlaceDirection()
+	public boolean canPlaceDirection(DirectionType eDirection)
 	{
 		if(tileType != TileType.TILE_EMPTY)
 			return false;
+		
+		// Check tiles in the direction that we want to place the arrow.
+		
+		Tile eNextTile = null;
+		
+		switch(eDirection)
+		{
+		case DIRECTION_UP:
+			eNextTile = grid.getTile(getX(), getY() - 1);
+			if(eNextTile == null) return false;
+			else
+			{
+				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
+					return false;
+			}
+			break;
+		case DIRECTION_RIGHT:
+			eNextTile = grid.getTile(getX() + 1, getY());
+			if(eNextTile == null) return false;
+			else
+			{
+				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
+					return false;
+			}
+			break;
+		case DIRECTION_DOWN:
+			eNextTile = grid.getTile(getX(), getY() + 1);
+			if(eNextTile == null) return false;
+			else
+			{
+				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
+					return false;
+			}
+			break;
+		case DIRECTION_LEFT:
+			eNextTile = grid.getTile(getX() - 1, getY());
+			if(eNextTile == null) return false;
+			else
+			{
+				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
+					return false;
+			}
+			break;
+		default: break;
+		}
 		
 		return true;
 	}

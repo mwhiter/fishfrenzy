@@ -39,10 +39,23 @@ public class Fish extends Entity
 	public void update(float deltaTime, Grid grid) // tried to send grid, but grid never updates ////////////
 	{
 		collideTiles(grid);
+		updateRotation();
 		updateVelocity(grid, deltaTime);
 		super.update(deltaTime);
 	}
 
+	public void updateRotation()
+	{
+		switch(direction)
+		{
+		case DIRECTION_UP: 		sprite.setRotation(0); break;
+		case DIRECTION_DOWN: 	sprite.setRotation(180); break;
+		case DIRECTION_LEFT: 	sprite.setRotation(90); break;
+		case DIRECTION_RIGHT: 	sprite.setRotation(270); break;
+		default: break;
+		}
+	}
+	
 	// Fish velocity is dependent on their direction, so update their velocity depending on their direction
 	public void updateVelocity(Grid grid, float deltaTime)
 	{
@@ -74,33 +87,6 @@ public class Fish extends Entity
 		}
 		
 	}
-	public void checkTile(Grid grid)
-	{
-		Tile currentTile = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
-		if(currentTile != null)
-		{
-			if (sprite.getX() <=currentTile.getCenterX() +8 && sprite.getX() >=currentTile.getCenterX() -8  && sprite.getY() <=currentTile.getCenterY() +8 && sprite.getY() >=currentTile.getCenterY() -8 )
-			{
-				if (currentTile.getDirection() == DirectionType.DIRECTION_LEFT)
-				{
-					direction = DirectionType.DIRECTION_LEFT;
-				}
-				if (currentTile.getDirection() == DirectionType.DIRECTION_RIGHT)
-				{
-					direction = DirectionType.DIRECTION_RIGHT;
-				}
-				if (currentTile.getDirection() == DirectionType.DIRECTION_UP)
-				{
-					direction = DirectionType.DIRECTION_UP;
-				}
-				if (currentTile.getDirection() == DirectionType.DIRECTION_DOWN)
-				{
-					direction = DirectionType.DIRECTION_DOWN;
-				}
-			}
-		}
-		
-	}
 	
 	// Turn toward a direction.
 	public void turn(DirectionType eTurnDirection)
@@ -117,7 +103,7 @@ public class Fish extends Entity
 			}
 		}
 		else if(eTurnDirection == DirectionType.DIRECTION_RIGHT)
-		{	
+		{			
 			switch(direction)
 			{
 			case DIRECTION_UP: 		direction = DirectionType.DIRECTION_RIGHT; 	break;
@@ -127,6 +113,19 @@ public class Fish extends Entity
 			default: break;
 			}
 		}
+	}
+	
+	public boolean canMoveInto(Tile dest)
+	{
+		if(dest == null) return false;
+		
+		if(dest.getTileType() == TileType.TILE_SOLID)
+			return false;
+		
+		if(dest.getTileType() == TileType.TILE_FISH_GATE)
+			return false;
+		
+		return true;
 	}
 	
 	// Fish checks tiles it could possibly collide with
@@ -144,10 +143,10 @@ public class Fish extends Entity
 			
 			// If we're near the center of the tile...
 			if (	
-					sprite.getX() + sprite.getWidth()/2 >= currentTile.getCenterX() - Constants.TILE_COLLIDE_BOX &&
-					sprite.getX() + sprite.getWidth()/2 <= currentTile.getCenterX() + Constants.TILE_COLLIDE_BOX &&
-					sprite.getY() + sprite.getHeight()/2 >= currentTile.getCenterY() - Constants.TILE_COLLIDE_BOX &&
-					sprite.getY() + sprite.getHeight()/2 <= currentTile.getCenterY() + Constants.TILE_COLLIDE_BOX
+					sprite.getX() + sprite.getWidth()/2 >= currentTile.getCenterX() - Constants.TILE_COLLIDE_BOX 	&&		// left side
+					sprite.getX() + sprite.getWidth()/2 <= currentTile.getCenterX() + Constants.TILE_COLLIDE_BOX 	&&		// right side
+					sprite.getY() + sprite.getHeight()/2 >= currentTile.getCenterY() - Constants.TILE_COLLIDE_BOX 	&&	// bottom side
+					sprite.getY() + sprite.getHeight()/2 <= currentTile.getCenterY() + Constants.TILE_COLLIDE_BOX		// top side
 				)
 			{
 				// If we hit a player gate tile, award that fish to the player
@@ -161,10 +160,13 @@ public class Fish extends Entity
 				}
 				
 				// If the current tile has a coin, this fish picks up the coin
-				if(currentTile.hasCoin())
+				if(!isHasCoin())
 				{
-					currentTile.removeCoin();
-					setHasCoin(true);
+					if(currentTile.hasCoin())
+					{
+						currentTile.removeCoin();
+						setHasCoin(true);
+					}
 				}
 				
 				// If the current tile has a direction, go through that direction.
@@ -183,7 +185,7 @@ public class Fish extends Entity
 					nextTile = grid.getTile(currentTile.getX(),currentTile.getY() - 1);
 					if(nextTile != null)
 					{
-						if (nextTile.getTileType() == TileType.TILE_SOLID )
+						if (!canMoveInto(nextTile))
 							turn(DirectionType.DIRECTION_RIGHT);
 					}
 					break;
@@ -191,7 +193,7 @@ public class Fish extends Entity
 					nextTile = grid.getTile(currentTile.getX() + 1,currentTile.getY());
 					if(nextTile != null)
 					{
-						if (nextTile.getTileType() == TileType.TILE_SOLID )
+						if (!canMoveInto(nextTile))
 							turn(DirectionType.DIRECTION_RIGHT);
 					}
 					break;
@@ -199,7 +201,7 @@ public class Fish extends Entity
 					nextTile = grid.getTile(currentTile.getX(),currentTile.getY() + 1);
 					if(nextTile != null)
 					{
-						if (nextTile.getTileType() == TileType.TILE_SOLID )
+						if (!canMoveInto(nextTile))
 							turn(DirectionType.DIRECTION_RIGHT);
 					}
 					break;
@@ -207,7 +209,7 @@ public class Fish extends Entity
 					nextTile = grid.getTile(currentTile.getX() - 1,currentTile.getY());
 					if(nextTile != null)
 					{
-						if (nextTile.getTileType() == TileType.TILE_SOLID )
+						if (!canMoveInto(nextTile))
 							turn(DirectionType.DIRECTION_RIGHT);
 					}
 					break;
