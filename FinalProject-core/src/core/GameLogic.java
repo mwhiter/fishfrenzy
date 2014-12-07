@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import objects.Player;
@@ -21,6 +22,11 @@ public class GameLogic {
 	private ArrayList<Player> players;
 	private ArrayList<GameObject> gameObjects;
 	private ArrayList<Integer> deadIndices;
+	
+	private int TopLeft = 0;
+	private   int BottomLeft = 0;
+	private   int TopRight = 0;
+	private   int BottomRight = 0;
 	
 	private long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
 	private long lastFishSpawnTime;		// last time a fish was spawned during this wave
@@ -96,6 +102,7 @@ public class GameLogic {
 					if (loopObject instanceof Fish)
 					{
 						((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
+						findFish((Fish) loopObject, grid);
 					}
 					// Update other objects
 					else
@@ -110,6 +117,9 @@ public class GameLogic {
 			GameObject dead = gameObjects.remove((int)index);
 			dead = null;
 		}
+		//System.out.println(TopLeft +  " " + TopRight + " "  + BottomLeft  + " "  + BottomRight);
+		System.out.println(mostFish() + "Has the most fish");
+		resetCount();
 	}
 	
 	// Create fish. Will only run at set intervals
@@ -145,6 +155,16 @@ public class GameLogic {
 		{
 			lastFishWaveSpawnTime = TimeUtils.millis();
 			fishSpawnCount = 0;
+			int d = MathUtils.random(4);
+			if (d == 0)
+			Fish.changeSpawnDir(DirectionType.DIRECTION_UP);
+			if (d == 1)
+				Fish.changeSpawnDir(DirectionType.DIRECTION_DOWN);
+			if (d == 2)
+				Fish.changeSpawnDir(DirectionType.DIRECTION_LEFT);
+			if (d == 3)
+				Fish.changeSpawnDir(DirectionType.DIRECTION_RIGHT);
+			
 		}
 	}
 	
@@ -170,6 +190,19 @@ public class GameLogic {
 			return;
 		}
 		
+	}
+	//Does not have it's own Constants yet used with fish
+	public void AIinput()
+	{
+		players.get(0).assignAITile(grid, grid.getTile((float) MathUtils.random(20,60),(float)  MathUtils.random(20,60)),DirectionType.DIRECTION_RIGHT);
+		if (mostFish() == 0)
+			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(100,500), MathUtils.random(100,500)),DirectionType.DIRECTION_RIGHT);
+		if (mostFish() == 1)
+			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_UP);
+		if (mostFish() == 2)
+			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_RIGHT);
+		if (mostFish() == 3)
+			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_UP);
 	}
 	
 	public Grid getGrid() { return grid; }
@@ -220,6 +253,40 @@ public class GameLogic {
 			lastAlgaeWaveSpawnTime = TimeUtils.millis();
 			algaeSpawnCount = 0;
 		}
+	}
+	
+	public void findFish(Fish f, Grid g)
+	{
+		//0,0 top left, 9,9
+		if ( f.getXloc(g) <= 4 )
+		{
+			if ( f.getYloc(g) <= 4 )
+				TopLeft++;
+			else BottomLeft++; 
+		}
+		else 
+		{
+			if ( f.getYloc(g) <= 4 )
+				TopRight++;
+			else BottomRight++; 
+		}
+	}
+	public void resetCount()
+	{
+		TopLeft = 0;
+		BottomLeft =0;
+		TopRight = 0;
+		BottomRight = 0;
+	}
+	public int mostFish()
+	{
+		int t = 0;
+		if (TopLeft >= BottomLeft && TopLeft >= BottomRight && TopLeft >= BottomLeft ) t=0;
+		if (TopRight >= BottomLeft && TopRight >= BottomRight && TopRight >= TopRight ) t= 1;
+		if (BottomLeft >= BottomRight && BottomLeft >= TopLeft && BottomLeft>= TopRight ) t = 2;
+		if (BottomRight >= BottomLeft && BottomRight >= TopLeft && BottomRight >= TopRight ) t= 3;
+		return t;
+		
 	}
 	
 	public int getNumFishActive() { return numFishActive; }

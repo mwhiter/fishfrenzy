@@ -13,6 +13,7 @@ import environment.TileType;
 public class Fish extends Entity
 {
 	DirectionType direction;
+	static DirectionType Startdirection = DirectionType.DIRECTION_UP;
 	private boolean hasCoin;
 	
 	// Constructor
@@ -29,8 +30,21 @@ public class Fish extends Entity
 	
 	private void init()
 	{
-		direction = DirectionType.DIRECTION_UP;
+		direction = Startdirection;
+		//direction = DirectionType.DIRECTION_UP;
 		hasCoin = false;
+	}
+	public int getXloc(Grid grid)
+	{
+		Tile t = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
+		if(t == null) return 0;
+		return t.getX();
+	}
+	public int getYloc(Grid grid)
+	{
+		Tile t = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
+		if(t == null) return 0;
+		return t.getY();
 	}
 	
 	public boolean isHasCoin() { return hasCoin; }
@@ -43,6 +57,8 @@ public class Fish extends Entity
 		updateVelocity(grid, deltaTime);
 		super.update(deltaTime);
 	}
+	
+	public static void changeSpawnDir(DirectionType eStartDirection) {Startdirection = eStartDirection;}
 
 	public void updateRotation()
 	{

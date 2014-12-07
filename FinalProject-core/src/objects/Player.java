@@ -3,6 +3,7 @@ package objects;
 import java.util.ArrayList;
 
 import core.DirectionType;
+import core.GameLogic;
 import environment.Grid;
 import environment.Tile;
 
@@ -18,6 +19,7 @@ public class Player {
 	
 	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
+	ArrayList<Tile> AItiles;
 	
 	// Constructor
 	public Player(int id, boolean bHuman)
@@ -42,14 +44,35 @@ public class Player {
 		{
 			return;
 		}
-		
 		// ai stuff here...
+		
+		//if (GameLogic.mostFish() == 0)
+		//{
+			//Tile temp = new Tile (grid,DirectionType)
+		//}
+		
+		
 	}
 	
 	public boolean isHuman()
 	{
 		return bHuman;
 	}
+	public void assignAITile(Grid grid, Tile tile,  DirectionType eDir)
+	{
+		if(grid == null) return;
+		if(tile == null) return;
+		if(tile.getDirection() == getActiveDirection()) return;
+		
+			tile.setTileDirection(this, eDir);
+			if (AItiles.size() > 2)
+		    {
+				grid.getTile(AItiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION );
+		     	AItiles.remove(0);
+			}
+			AItiles.add(tile);
+	}
+	
 	
 	public void assignTile(Grid grid, Tile tile)
 	{
