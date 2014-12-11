@@ -160,8 +160,9 @@ public class GameLogic {
 			lastFishWaveSpawnTime = TimeUtils.millis();
 			fishSpawnCount = 0;
 			int d = MathUtils.random(4);
+			
 			if (d == 0)
-			Fish.changeSpawnDir(DirectionType.DIRECTION_UP);
+				Fish.changeSpawnDir(DirectionType.DIRECTION_UP);
 			if (d == 1)
 				Fish.changeSpawnDir(DirectionType.DIRECTION_DOWN);
 			if (d == 2)
