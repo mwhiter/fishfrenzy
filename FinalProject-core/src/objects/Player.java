@@ -2,6 +2,9 @@ package objects;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.utils.TimeUtils;
+
+import core.Constants;
 import core.DirectionType;
 import core.GameLogic;
 import environment.Grid;
@@ -19,7 +22,6 @@ public class Player {
 	
 	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
-	ArrayList<Tile> AItiles;
 	
 	// Constructor
 	public Player(int id, boolean bHuman)
@@ -39,6 +41,7 @@ public class Player {
 	// Is this really the best thing to do? Maybe not...discuss at some point
 	public void update()
 	{
+		
 		// Don't update for humans because they make their own decisions
 		if(!isHuman()) 
 		{
@@ -50,8 +53,6 @@ public class Player {
 		//{
 			//Tile temp = new Tile (grid,DirectionType)
 		//}
-		
-		
 	}
 	
 	public boolean isHuman()
@@ -65,12 +66,12 @@ public class Player {
 		if(tile.getDirection() == getActiveDirection()) return;
 		
 			tile.setTileDirection(this, eDir);
-			if (AItiles.size() > 2)
+			if (tiles.size() > 2)
 		    {
-				grid.getTile(AItiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION );
-		     	AItiles.remove(0);
+				grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION );
+		     	tiles.remove(0);
 			}
-			AItiles.add(tile);
+			tiles.add(tile);
 	}
 	
 	
