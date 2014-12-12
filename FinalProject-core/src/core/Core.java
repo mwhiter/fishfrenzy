@@ -16,7 +16,6 @@ public class Core extends Game {
 	public void create()
 	{
 		menuScreen = new MainMenuScreen(this);
-		gameScreen = new GameScreen(this);
 		setScreen(menuScreen);
 	}
 	

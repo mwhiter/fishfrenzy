@@ -7,6 +7,7 @@ import ui.UIElement;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 
 import core.Core;
@@ -19,6 +20,8 @@ public class GameScreen implements Screen, InputProcessor {
 	private GameLogic logic;
 	private GameRender render;
 	
+	Music ambience;
+	
 	private ArrayList<UIElement> ui_elements;
 	
 	public GameScreen(Core game)
@@ -29,6 +32,8 @@ public class GameScreen implements Screen, InputProcessor {
 		
 		logic 	= new GameLogic();
 		render 	= new GameRender(logic);
+		
+		ambience = Gdx.audio.newMusic(Gdx.files.internal("music/ambience.ogg"));
 	}
 	
 	@Override
@@ -49,12 +54,13 @@ public class GameScreen implements Screen, InputProcessor {
 	public void show()
 	{
 		Gdx.input.setInputProcessor(this);
+		ambience.play();
 	}
 	
 	@Override
 	public void hide()
 	{
-		
+		ambience.pause();
 	}
 	
 	@Override
@@ -72,7 +78,7 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public void dispose()
 	{
-		
+		ambience.dispose();
 	}
 	
 	@Override
