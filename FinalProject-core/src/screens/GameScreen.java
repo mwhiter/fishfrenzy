@@ -26,6 +26,9 @@ public class GameScreen implements Screen, InputProcessor {
 		super();
 		this.game = game;
 		ui_elements = new ArrayList<UIElement>();
+		
+		logic 	= new GameLogic();
+		render 	= new GameRender(logic);
 	}
 	
 	@Override
@@ -45,8 +48,6 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public void show()
 	{
-		logic 	= new GameLogic();
-		render 	= new GameRender(logic);
 		Gdx.input.setInputProcessor(this);
 	}
 	
@@ -83,6 +84,14 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public boolean keyTyped(char character)
 	{
+		switch(character)
+		{
+		case 'p':
+		case 'P':
+			game.setScreen(new PauseScreen(game, render, this));
+			break;
+		}
+		
 		return false;
 	}
 	

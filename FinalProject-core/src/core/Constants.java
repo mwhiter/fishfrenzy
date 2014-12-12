@@ -19,5 +19,8 @@ public class Constants {
 	public final static int COIN_SPAWN_WAVE_SIZE = 2;
 	public final static int MAX_NUM_COINS = 4;
 	
+	/* AI Consts */
+	public final static int TIME_BETWEEN_AI_MOVE = 1000;
+	
 	public final static int FISH_SPEED = 20000;						// speed of the fish
 }

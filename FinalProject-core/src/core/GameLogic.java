@@ -38,6 +38,8 @@ public class GameLogic {
 	private int algaeSpawnCount;
 	private int numAlgaeActive;
 	
+	private long lastAIPlaceTime;	
+	
 	// Constructor
 	public GameLogic()
 	{		
@@ -68,10 +70,10 @@ public class GameLogic {
 	{
 		processKeyboardInput();
 		processMouseInput();
-		
 		// Fish spawn logic - pretty basic right now
 		doCreateFish();
 		doCreateAlgae();
+		
 		
 		// Update players
 		for(int i=0; i < players.size(); i++)
@@ -118,8 +120,10 @@ public class GameLogic {
 			dead = null;
 		}
 		//System.out.println(TopLeft +  " " + TopRight + " "  + BottomLeft  + " "  + BottomRight);
-		System.out.println(mostFish() + "Has the most fish");
-		resetCount();
+		//System.out.println(mostFish() + "Has the most fish");
+		//AIinput();
+		doCreateAI();
+		resetCount();//to keep track of fish locations Fish Locations
 	}
 	
 	// Create fish. Will only run at set intervals
@@ -181,7 +185,8 @@ public class GameLogic {
 	private void processMouseInput()
 	{
 		float my, mx;
-		if (Gdx.input.isKeyJustPressed(Input.Keys.L))
+		//if (Gdx.input.isKeyJustPressed(Input.Keys.L))
+		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
 		{
 			// Store the mouse coordinates
 			mx = Gdx.input.getX();
@@ -195,15 +200,29 @@ public class GameLogic {
 	//Does not have it's own Constants yet used with fish
 	public void AIinput()
 	{
-		players.get(0).assignAITile(grid, grid.getTile((float) MathUtils.random(20,60),(float)  MathUtils.random(20,60)),DirectionType.DIRECTION_RIGHT);
+		//players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
+		//players.get(1).assignTile(grid, grid.getTile(3,2));
+		System.out.println(mostFish());
 		if (mostFish() == 0)
-			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(100,500), MathUtils.random(100,500)),DirectionType.DIRECTION_RIGHT);
+		{
+			players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
+			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(0,3),MathUtils.random(0,3)));
+		}
 		if (mostFish() == 1)
-			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_UP);
+		{
+			players.get(1).setActiveDirection(DirectionType.DIRECTION_UP); 
+			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(4,9),MathUtils.random(0,3)));
+		}
 		if (mostFish() == 2)
-			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_RIGHT);
+		{
+			players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
+			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(0,3),MathUtils.random(4,9)));
+		}
 		if (mostFish() == 3)
-			players.get(0).assignAITile(grid, grid.getTile(MathUtils.random(0,500), MathUtils.random(0,500)),DirectionType.DIRECTION_UP);
+		{
+			players.get(1).setActiveDirection(DirectionType.DIRECTION_UP); 
+			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(4,9),MathUtils.random(4,9)));
+		}
 	}
 	
 	public Grid getGrid() { return grid; }
@@ -214,6 +233,21 @@ public class GameLogic {
 	}
 	public ArrayList<Player> getPlayers() { return players; }
 	public ArrayList<GameObject> getGameObjects() { return gameObjects; }
+	
+	public void doCreateAI()
+	{
+		long currentTime = TimeUtils.millis();
+		
+		if(lastAIPlaceTime != -1)
+		{
+			if(currentTime - Constants.TIME_BETWEEN_AI_MOVE < lastAIPlaceTime)
+			return;
+		}
+		lastAIPlaceTime = TimeUtils.millis();
+		AIinput();
+		if (lastAIPlaceTime >=  Constants.TIME_BETWEEN_AI_MOVE)
+			lastAIPlaceTime = TimeUtils.millis();
+	}
 	
 	public void doCreateAlgae()
 	{
