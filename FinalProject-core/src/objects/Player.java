@@ -2,11 +2,8 @@ package objects;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.utils.TimeUtils;
 
-import core.Constants;
 import core.DirectionType;
-import core.GameLogic;
 import environment.Grid;
 import environment.Tile;
 
@@ -19,6 +16,7 @@ public class Player {
 	private int iFishCaptured;	// number of fish captured
 	private int iScore;			// actual game score (could be different from fish captured
 	private int iCoins;			// number of coins we've collected
+	private Tile home;			// the home gate for this player
 	
 	private DirectionType activeDirection;
 	ArrayList<Tile> tiles;
@@ -29,6 +27,7 @@ public class Player {
 		this.id = id;
 		this.bHuman = bHuman;
 		
+		home = null;
 		iScore = 0;
 		iFishCaptured = 0;
 		iCoins = 0;
@@ -112,6 +111,8 @@ public class Player {
 		fish.setDelayedDeath(true);
 	}
 	
+	public void setHome(Tile tile) { home = tile; }
+	public Tile getHome() { return home; }
 	public int getNumFishCaptured() { return iFishCaptured; }
 	public int getScore()			{ return iScore; }
 	public int getCoins()			{ return iCoins; }

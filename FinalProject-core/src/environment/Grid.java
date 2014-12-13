@@ -104,6 +104,7 @@ public class Grid {
 				case TILE_PLAYER_GATE:
 					if(playerSpawnAssigned < logic.getPlayers().size())
 					{
+						logic.getPlayer(playerSpawnAssigned).setHome(grid[i][j]);
 						grid[i][j].setOwner(logic.getPlayer(playerSpawnAssigned));
 						playerSpawnAssigned++;
 					}
