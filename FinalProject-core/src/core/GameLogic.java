@@ -14,7 +14,6 @@ import objects.Fish;
 import environment.Grid;
 import environment.Tile;
 
-//HAVE TO PRESS L TO place an Arrow
 
 public class GameLogic {
 	
@@ -34,6 +33,10 @@ public class GameLogic {
 	private static long lastAlgaeSpawnTime;	
 	private static int algaeSpawnCount;
 	private static int numAlgaeActive;
+	
+	private static long dbPowerTime = -1;
+	private static long fzPowerTime  = -1;
+	
 	
 	private DirectionType waveSpawnDirection;
 	
@@ -80,8 +83,8 @@ public class GameLogic {
 		// Fish spawn logic - pretty basic right now
 		doCreateFish();
 		doCreateAlgae();
-		
-		
+		checkDBPowerUp();
+		checkFZPowerUp();
 		// Update players
 		for(int i=0; i < players.size(); i++)
 		{
@@ -205,6 +208,24 @@ public class GameLogic {
 		if (key == Input.Keys.D) { players.get(0).setActiveDirection(DirectionType.DIRECTION_RIGHT); 	}
 		if (key == Input.Keys.W) { players.get(0).setActiveDirection(DirectionType.DIRECTION_UP); 		}
 		
+		if (key == Input.Keys.R) 
+		{
+			//if (players.get(0).getCoins() >= 2)  
+			{players.get(0).useCoins(2);rmPowerUP();}
+		}
+		if (key == Input.Keys.T) 
+		{
+			//if (players.get(0).getCoins() >= 4)  
+			{players.get(0).useCoins(4);FZPowerUP();}
+		}
+		if (key == Input.Keys.Y) 
+		{
+			//if (players.get(0).getCoins() >= 6)  
+			{players.get(0).useCoins(6);dbPowerUP();}
+		}
+		
+		
+		
 	}
 	
 	public void processMouseInput(float screenX, float screenY, int button)
@@ -255,7 +276,6 @@ public class GameLogic {
 				spawnTile = null;
 			}
 		}
-		
 		spawnTile.createCoin();
 		
 		if(algaeSpawnCount >= Constants.COIN_SPAWN_WAVE_SIZE)
@@ -291,6 +311,59 @@ public class GameLogic {
 		}
 		
 		return rtnPlayer;
+	}
+	
+	public void rmPowerUP()
+	{
+		if (players.get(1).getTiles().size() >= 1)
+		{
+			int rm = MathUtils.random(0, players.get(1).getTiles().size()-1);
+			players.get(1).unassignTile(players.get(1).getTiles().get(rm));
+		}
+	}
+	public void dbPowerUP()
+	{
+		players.get(0).setDBPowerup(true);
+	}
+		
+	public void checkDBPowerUp ()
+	{
+	   if (players.get(0).getDBPowerup() == false)
+		{
+			dbPowerTime = TimeUtils.millis();
+			return;
+		}
+		else 
+		{
+			long currentTime = TimeUtils.millis();
+			if(dbPowerTime != -1)
+			{
+				if(currentTime - Constants.TIME_FOR_DOUBLE_POINTS > dbPowerTime)
+					players.get(0).setDBPowerup(false);
+			}
+		}
+	}
+	public void FZPowerUP()
+	{
+		players.get(1).setFZPowerup(true);
+	}
+	public void checkFZPowerUp()
+	{
+	   if (players.get(1).getFZPowerup() == false)
+		{
+			fzPowerTime = TimeUtils.millis();
+			return;
+		}
+		else 
+		{
+			long currentTime = TimeUtils.millis();
+			if(fzPowerTime != -1)
+			{
+				if(currentTime - Constants.TIME_FOR_FREEZE > fzPowerTime)
+					players.get(1).setFZPowerup(false);
+				//Sets the value to true but does not change it back to false
+			}
+		}
 	}
 	
 	public int getGoalFish() { return goalFish; }

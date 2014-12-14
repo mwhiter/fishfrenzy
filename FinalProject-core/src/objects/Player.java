@@ -14,6 +14,8 @@ import environment.Tile;
 	// Needs to have an isHuman() flag. Because only humans will accept input from the game board
 public class Player {
 	private boolean bHuman;
+	private boolean doublePoints = false;
+	private boolean isFrozen = false;
 	private int id;
 	private int iFishCaptured;	// number of fish captured
 	private int iScore;			// actual game score (could be different from fish captured
@@ -43,7 +45,8 @@ public class Player {
 	// What does it mean to update a Player? Run its AI (this is called once per frame)
 	// Is this really the best thing to do? Maybe not...discuss at some point
 	public void update(Grid grid)
-	{		
+	{	
+		if (isFrozen == false)
 		ai.update(grid);
 	}
 	
@@ -94,6 +97,7 @@ public class Player {
 	{
 		iFishCaptured++;
 		iScore++;
+		if (doublePoints == true){iFishCaptured++;iScore++;}
 		
 		//System.out.println("Player " + id + " captured a fish (coin: " + fish.isHasCoin() + ")");
 		
@@ -111,7 +115,12 @@ public class Player {
 	public int getNumFishCaptured() { return iFishCaptured; }
 	public int getScore()			{ return iScore; }
 	public int getCoins()			{ return iCoins; }
+	public void useCoins(int s)		{iCoins -= s;}
 	//public void incTile()			{ tileAmmo ++; }
+	public boolean getDBPowerup()		{return doublePoints;} 
+	public void setDBPowerup(boolean b) {doublePoints = b;}
+	public boolean getFZPowerup()		{return isFrozen;} 
+	public void setFZPowerup(boolean b) {isFrozen = b;}
 	
 	public ArrayList<Tile> getTiles() { return tiles; }
 	public DirectionType getActiveDirection() { return activeDirection; }

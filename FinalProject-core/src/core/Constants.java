@@ -22,6 +22,10 @@ public class Constants {
 	public final static int COIN_SPAWN_WAVE_SIZE = 2;
 	public final static int MAX_NUM_COINS = 4;
 	
+	/* Power Ups */
+	public final static int TIME_FOR_DOUBLE_POINTS = 4000;
+	public final static int TIME_FOR_FREEZE = 5000;
+	
 	/* AI Consts */
 	// TODO: difficulty speeds up these values
 	public final static int TIME_BETWEEN_AI_MOVE = 800;
