@@ -37,7 +37,49 @@ public class GameRender {
 			drawScore(player, spriteBatch);
 		}
 		
+		drawGame(spriteBatch);
+		
 		spriteBatch.end();
+	}
+	
+	// time string in mm:ss:ms format
+	private String getTimeString(long time)
+	{
+		String rtnString = "";
+		
+		Long ms = time;
+		ms %= 1000;
+		
+		Long seconds = time / 1000;
+		seconds %= 60;
+		
+		Long minutes = seconds / 60;
+		
+		if(time < 10000)
+			rtnString = minutes.toString() + ":" + seconds.toString() + ":" + ms.toString();
+		else
+			rtnString  = minutes.toString() + ":" + seconds.toString();
+		
+		return rtnString;
+	}
+	
+	private void drawGame(Batch batch)
+	{
+		BitmapFont font = new BitmapFont();
+		
+		String szTime = "Time Remaining: " + getTimeString(logic.getTimeRemaining());
+		String szFish = "Fish Left: " + logic.getPlayerMostFish().getNumFishCaptured() + " (Player " + (logic.getPlayerMostFish().getID()+1) + ")/ MAX_FISH";
+		
+		/*
+		Float deltaTime = Gdx.graphics.getDeltaTime();
+		String szDebug1 = deltaTime.toString();
+		String szDebug2 = "Num objects: " + logic.getGameObjects().size();
+		font.draw(batch, szDebug1, Constants.WIDTH/2 - (font.getBounds(szDebug1).width / 2), Constants.HEIGHT - 32);
+		font.draw(batch, szDebug2, Constants.WIDTH/2 - (font.getBounds(szDebug2).width / 2), Constants.HEIGHT - 48);
+		*/
+		
+		font.draw(batch, szTime, Constants.WIDTH/2 - (font.getBounds(szTime).width / 2), Constants.HEIGHT);
+		font.draw(batch, szFish, Constants.WIDTH/2 - (font.getBounds(szFish).width / 2), Constants.HEIGHT - 16);
 	}
 	
 	private void drawScore(Player player, Batch batch)
@@ -45,10 +87,12 @@ public class GameRender {
 		BitmapFont font = new BitmapFont();
 		font.setColor(Color.WHITE);		
 		
-		Integer numAlgae = player.getCoins();
-		Integer numFish = player.getNumFishCaptured();
+		String sz1 = "Player " + (player.getID()+1);
+		String sz2 = player.getCoins() + " Coins";
+		String sz3 = player.getNumFishCaptured() + " Fish";
 		
-		font.draw(batch, "Coins: " + numAlgae.toString(), player.getHome().getCenterX() - 24, player.getHome().getCenterY());
-		font.draw(batch, "Fish: " + numFish.toString(), player.getHome().getCenterX() - 24, player.getHome().getCenterY() + 16);
+		font.draw(batch, sz1, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 24);
+		font.draw(batch, sz2, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() - 8);
+		font.draw(batch, sz3, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 8);
 	}
 }

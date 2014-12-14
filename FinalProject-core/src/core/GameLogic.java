@@ -18,27 +18,28 @@ import environment.Tile;
 
 public class GameLogic {
 	
-	private Grid grid;
-	private ArrayList<Player> players;
-	private ArrayList<GameObject> gameObjects;
-	private ArrayList<Integer> deadIndices;
+	private static Grid grid;
+	private static ArrayList<Player> players;
+	private static ArrayList<GameObject> gameObjects;
+	private static ArrayList<Integer> deadIndices;
 	
-	private int TopLeft = 0;
-	private   int BottomLeft = 0;
-	private   int TopRight = 0;
-	private   int BottomRight = 0;
+	private static long gameStartTime;
 	
-	private long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
-	private long lastFishSpawnTime;		// last time a fish was spawned during this wave
-	private int fishSpawnCount;			// amount of fish we've spawned in this wave
-	private int numFishActive;			// number of fish currently active
+	private static long lastFishWaveSpawnTime;	// last time we've completed spawning a wave
+	private static long lastFishSpawnTime;		// last time a fish was spawned during this wave
+	private static int fishSpawnCount;			// amount of fish we've spawned in this wave
+	private static int numFishActive;			// number of fish currently active
 	
-	private long lastAlgaeWaveSpawnTime;	
-	private long lastAlgaeSpawnTime;	
-	private int algaeSpawnCount;
-	private int numAlgaeActive;
+	private static long lastAlgaeWaveSpawnTime;	
+	private static long lastAlgaeSpawnTime;	
+	private static int algaeSpawnCount;
+	private static int numAlgaeActive;
 	
-	private long lastAIPlaceTime;	
+	private DirectionType waveSpawnDirection;
+	
+	// Victory conditions
+	private int goalFish;
+	private long timeLimit;
 	
 	// Constructor
 	public GameLogic()
@@ -51,12 +52,13 @@ public class GameLogic {
 		deadIndices = new ArrayList<Integer>();
 		
 		// For now, just init two players - one human, one AI
-		players.add(new Player(0, true));
-		players.add(new Player(1, false));
+		players.add(new Player(this, 0, true));
+		players.add(new Player(this, 1, false));
 
 		// Grid actually needs to know the players now so it has to come after they're initialized
 		grid = new Grid(this, "grids/grid0.txt");
 
+		gameStartTime = 0;
 		lastFishWaveSpawnTime = -1;
 		fishSpawnCount = 0;
 		numFishActive = 0;
@@ -64,12 +66,17 @@ public class GameLogic {
 		lastAlgaeWaveSpawnTime = -1;
 		algaeSpawnCount = 0;
 		numAlgaeActive = 0;
+
+		// TODO: Test victory conditions values! Fix it!
+		goalFish = 200;		// 200 fish to capture
+		timeLimit = 60000;	// 60 ms time limit
+		gameStartTime = TimeUtils.millis();
+		
+		waveSpawnDirection = DirectionType.NO_DIRECTION;
 	}
 	
 	public void update()
-	{
-		processKeyboardInput();
-		processMouseInput();
+	{	
 		// Fish spawn logic - pretty basic right now
 		doCreateFish();
 		doCreateAlgae();
@@ -79,7 +86,7 @@ public class GameLogic {
 		for(int i=0; i < players.size(); i++)
 		{
 			Player loopPlayer = players.get(i);
-			loopPlayer.update();
+			loopPlayer.update(grid);
 			//grid = loopPlayer.returnUpdatedGrid();
 		}
 		
@@ -104,7 +111,6 @@ public class GameLogic {
 					if (loopObject instanceof Fish)
 					{
 						((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
-						findFish((Fish) loopObject, grid);
 					}
 					// Update other objects
 					else
@@ -114,16 +120,23 @@ public class GameLogic {
 		}
 		
 		for(Integer index : deadIndices)
-		{
-			@SuppressWarnings("unused")
-			GameObject dead = gameObjects.remove((int)index);
-			dead = null;
+		{	
+			try
+			{
+				@SuppressWarnings("unused")
+				GameObject dead = gameObjects.remove((int)index);
+				dead = null;
+			}
+			catch(IndexOutOfBoundsException e)
+			{
+				System.out.println("Tried to delete an object with index " + index);
+			}
 		}
 		//System.out.println(TopLeft +  " " + TopRight + " "  + BottomLeft  + " "  + BottomRight);
 		//System.out.println(mostFish() + "Has the most fish");
 		//AIinput();
-		doCreateAI();
-		resetCount();//to keep track of fish locations Fish Locations
+		//doCreateAI();
+		//resetCount();//to keep track of fish locations Fish Locations
 	}
 	
 	// Create fish. Will only run at set intervals
@@ -132,6 +145,10 @@ public class GameLogic {
 		long currentTime = TimeUtils.millis();
 		
 		if(numFishActive >= Constants.MAX_NUM_ACTIVE_FISH)
+			return;
+		
+		// initial delay
+		if(getTimeElapsedInGame() <= Constants.FISH_DELAY)
 			return;
 		
 		// Wave of fish
@@ -153,75 +170,48 @@ public class GameLogic {
 		lastFishSpawnTime = TimeUtils.millis();
 		fishSpawnCount++;
 		numFishActive++;
-		gameObjects.add(new Fish(new Texture("objects/fish.png"), grid.GetRandomFishSpawn()));
+		
+		if(waveSpawnDirection == DirectionType.NO_DIRECTION)
+			pickNewFishDirection();
+		
+		gameObjects.add(new Fish(waveSpawnDirection, grid, new Texture("objects/fish.png"), grid.GetRandomFishSpawn()));
 		
 		if(fishSpawnCount >= Constants.FISH_SPAWN_WAVE_SIZE)
 		{
 			lastFishWaveSpawnTime = TimeUtils.millis();
 			fishSpawnCount = 0;
-			int d = MathUtils.random(4);
 			
-			if (d == 0)
-				Fish.changeSpawnDir(DirectionType.DIRECTION_UP);
-			if (d == 1)
-				Fish.changeSpawnDir(DirectionType.DIRECTION_DOWN);
-			if (d == 2)
-				Fish.changeSpawnDir(DirectionType.DIRECTION_LEFT);
-			if (d == 3)
-				Fish.changeSpawnDir(DirectionType.DIRECTION_RIGHT);
-			
+			pickNewFishDirection();
 		}
 	}
 	
-	private void processKeyboardInput()
+	private void pickNewFishDirection()
 	{
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_LEFT);	}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_DOWN); 	}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_RIGHT); 	}
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) { players.get(0).setActiveDirection(DirectionType.DIRECTION_UP); 		}
+		int newDirection = MathUtils.random(0, 3);
+		switch(newDirection)
+		{
+			case 0: waveSpawnDirection = DirectionType.DIRECTION_UP; break;
+			case 1: waveSpawnDirection = DirectionType.DIRECTION_DOWN; break;
+			case 2: waveSpawnDirection = DirectionType.DIRECTION_RIGHT; break;
+			case 3: waveSpawnDirection = DirectionType.DIRECTION_LEFT; break;
+			default: break;
+		}
+	}
+	
+	public void processKeyboardInput(int key)
+	{
+		if (key == Input.Keys.A) { players.get(0).setActiveDirection(DirectionType.DIRECTION_LEFT);		}
+		if (key == Input.Keys.S) { players.get(0).setActiveDirection(DirectionType.DIRECTION_DOWN); 	}
+		if (key == Input.Keys.D) { players.get(0).setActiveDirection(DirectionType.DIRECTION_RIGHT); 	}
+		if (key == Input.Keys.W) { players.get(0).setActiveDirection(DirectionType.DIRECTION_UP); 		}
 		
 	}
 	
-	private void processMouseInput()
+	public void processMouseInput(float screenX, float screenY, int button)
 	{
-		float my, mx;
-		//if (Gdx.input.isKeyJustPressed(Input.Keys.L))
-		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT))
-		{
-			// Store the mouse coordinates
-			mx = Gdx.input.getX();
-			my = Gdx.input.getY();
-			
-			players.get(0).assignTile(grid, grid.getTile(mx, my));
-			return;
-		}
-		
-	}
-	//Does not have it's own Constants yet used with fish
-	public void AIinput()
-	{
-		//players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
-		//players.get(1).assignTile(grid, grid.getTile(3,2));
-		System.out.println(mostFish());
-		if (mostFish() == 0)
-		{
-			players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
-			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(0,3),MathUtils.random(0,3)));
-		}
-		if (mostFish() == 1)
-		{
-			players.get(1).setActiveDirection(DirectionType.DIRECTION_UP); 
-			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(4,9),MathUtils.random(0,3)));
-		}
-		if (mostFish() == 2)
-		{
-			players.get(1).setActiveDirection(DirectionType.DIRECTION_RIGHT); 
-			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(0,3),MathUtils.random(4,9)));
-		}
-		if (mostFish() == 3)
-		{
-			players.get(1).setActiveDirection(DirectionType.DIRECTION_UP); 
-			players.get(1).assignTile(grid, grid.getTile(MathUtils.random(4,9),MathUtils.random(4,9)));
+		if (button == Input.Buttons.LEFT)
+		{	
+			players.get(0).assignTile(grid, grid.getTile(screenX, screenY));
 		}
 	}
 	
@@ -233,21 +223,6 @@ public class GameLogic {
 	}
 	public ArrayList<Player> getPlayers() { return players; }
 	public ArrayList<GameObject> getGameObjects() { return gameObjects; }
-	
-	public void doCreateAI()
-	{
-		long currentTime = TimeUtils.millis();
-		
-		if(lastAIPlaceTime != -1)
-		{
-			if(currentTime - Constants.TIME_BETWEEN_AI_MOVE < lastAIPlaceTime)
-			return;
-		}
-		lastAIPlaceTime = TimeUtils.millis();
-		AIinput();
-		if (lastAIPlaceTime >=  Constants.TIME_BETWEEN_AI_MOVE)
-			lastAIPlaceTime = TimeUtils.millis();
-	}
 	
 	public void doCreateAlgae()
 	{
@@ -290,40 +265,37 @@ public class GameLogic {
 		}
 	}
 	
-	public void findFish(Fish f, Grid g)
+	// Returns the distance between two tiles
+	public static float getDistance(Tile t1, Tile t2)
 	{
-		//0,0 top left, 9,9
-		if ( f.getXloc(g) <= 4 )
-		{
-			if ( f.getYloc(g) <= 4 )
-				TopLeft++;
-			else BottomLeft++; 
-		}
-		else 
-		{
-			if ( f.getYloc(g) <= 4 )
-				TopRight++;
-			else BottomRight++; 
-		}
+		return (float)Math.sqrt(Math.pow((double)(t2.getX()-t1.getX()), 2) + Math.pow((double)(t2.getY()-t1.getY()), 2));
 	}
-	public void resetCount()
-	{
-		TopLeft = 0;
-		BottomLeft =0;
-		TopRight = 0;
-		BottomRight = 0;
-	}
-	public int mostFish()
-	{
-		int t = 0;
-		if (TopLeft >= BottomLeft && TopLeft >= BottomRight && TopLeft >= BottomLeft ) t=0;
-		if (TopRight >= BottomLeft && TopRight >= BottomRight && TopRight >= TopRight ) t= 1;
-		if (BottomLeft >= BottomRight && BottomLeft >= TopLeft && BottomLeft>= TopRight ) t = 2;
-		if (BottomRight >= BottomLeft && BottomRight >= TopLeft && BottomRight >= TopRight ) t= 3;
-		return t;
-		
-	}
+	
+	public static void changeNumAlgaeActive(int iChange) { numAlgaeActive += iChange; }
 	
 	public int getNumFishActive() { return numFishActive; }
 	public void changeNumFishActive(int iChange) { numFishActive += iChange; }
+	
+	public Player getPlayerMostFish()
+	{
+		Player rtnPlayer = null;
+		int highestFish = -1;
+		
+		for(Player player : players)
+		{
+			if(player.getNumFishCaptured() > highestFish)
+			{
+				highestFish = player.getNumFishCaptured();
+				rtnPlayer = player;
+			}
+		}
+		
+		return rtnPlayer;
+	}
+	
+	public int getGoalFish() { return goalFish; }
+	public void setGoalFish(int iValue) { goalFish = Math.max(0, iValue); }
+	
+	public long getTimeElapsedInGame() { return TimeUtils.millis() - gameStartTime; }
+	public long getTimeRemaining() { return Math.max(0, timeLimit - getTimeElapsedInGame()); }
 }

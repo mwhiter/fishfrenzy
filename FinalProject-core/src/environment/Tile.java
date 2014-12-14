@@ -1,6 +1,5 @@
 package environment;
 
-//import com.badlogic.gdx.Gdx;
 import objects.Algae;
 import objects.Player;
 
@@ -22,6 +21,7 @@ public class Tile {
 	private TileType tileType;
 	private DirectionType direction;
 	private Player owner;
+	private Player direction_setter;
 	
 	private Algae coin;
 	
@@ -47,6 +47,7 @@ public class Tile {
 		
 		tileType = eTileType;
 		direction = DirectionType.NO_DIRECTION;
+		direction_setter = null;
 		
 		texture = new Texture("tilesheet.png");
 		tileTextures = TextureRegion.split(texture, Constants.TILE_SIZE, Constants.TILE_SIZE);
@@ -86,6 +87,8 @@ public class Tile {
 	public int getY() { return y; }
 	public DirectionType getDirection() { return direction; }
 	// Returns the tile's owner. Can be null!
+	public Player getDirectionSetter() { return direction_setter; }
+	public void setDirectionSetter(Player player) { direction_setter = player; }
 	public Player getOwner() { return owner; }
 	public void setOwner(Player player) { owner = player; }
 	public boolean hasOwner() { return owner != null; }
@@ -152,48 +155,11 @@ public class Tile {
 			return false;
 		
 		// Check tiles in the direction that we want to place the arrow.
-		
-		Tile eNextTile = null;
-		
-		switch(eDirection)
+		Tile eNextTile = grid.getTileInDirection(this, eDirection);
+		if(eNextTile != null)
 		{
-		case DIRECTION_UP:
-			eNextTile = grid.getTile(getX(), getY() - 1);
-			if(eNextTile == null) return false;
-			else
-			{
-				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
-					return false;
-			}
-			break;
-		case DIRECTION_RIGHT:
-			eNextTile = grid.getTile(getX() + 1, getY());
-			if(eNextTile == null) return false;
-			else
-			{
-				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
-					return false;
-			}
-			break;
-		case DIRECTION_DOWN:
-			eNextTile = grid.getTile(getX(), getY() + 1);
-			if(eNextTile == null) return false;
-			else
-			{
-				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
-					return false;
-			}
-			break;
-		case DIRECTION_LEFT:
-			eNextTile = grid.getTile(getX() - 1, getY());
-			if(eNextTile == null) return false;
-			else
-			{
-				if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
-					return false;
-			}
-			break;
-		default: break;
+			if(eNextTile.getTileType() != TileType.TILE_EMPTY && eNextTile.getTileType() != TileType.TILE_PLAYER_GATE)
+				return false;
 		}
 		
 		return true;

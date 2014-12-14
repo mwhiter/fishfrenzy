@@ -3,6 +3,7 @@ package environment;
 import java.util.ArrayList;
 
 import core.Constants;
+import core.DirectionType;
 import core.GameLogic;
 import environment.TileType;
 
@@ -174,12 +175,34 @@ public class Grid {
 		if(tile == null) return null;
 		return grid[tile.getX()][tile.getY()];
 	}
+	public Tile getTileInDirection(Tile tile, DirectionType direction)
+	{	
+		if(direction == DirectionType.NO_DIRECTION)
+			return null;
+		
+		switch(direction)
+		{
+		case DIRECTION_UP:
+			return getTile(tile.getX(), tile.getY()-1);
+		case DIRECTION_DOWN:
+			return getTile(tile.getX(), tile.getY()+1);
+		case DIRECTION_LEFT:
+			return getTile(tile.getX()-1, tile.getY());
+		case DIRECTION_RIGHT:
+			return getTile(tile.getX()+1, tile.getY());
+		default:
+			return null;
+		}
+	}
 	
 	public int getWidth() 	{ return width; }
 	public int getHeight() 	{ return height; }
 	public float getStartX() { return startX; }
 	public float getStartY() { return startY; }
+	
+	// returns width * tile size
 	public int getSizeX()	{ return width * Constants.TILE_SIZE; }
+	// returns height * tile size
 	public int getSizeY()	{ return height * Constants.TILE_SIZE; }
 	
 	/* Support for multiple fish spawns */

@@ -1,9 +1,11 @@
 package objects;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 
 import core.Constants;
 import core.DirectionType;
+import core.GameLogic;
 import environment.Tile;
 import environment.Grid;
 import environment.TileType;
@@ -12,35 +14,39 @@ import environment.TileType;
 // Fish spawn from the center and move in a certain direction.
 public class Fish extends Entity
 {
+	Grid grid;
 	DirectionType direction;
-	static DirectionType Startdirection = DirectionType.DIRECTION_UP;
 	private boolean hasCoin;
 	
 	// Constructor
-	public Fish(Texture texture)
+	public Fish(DirectionType direction, Grid grid, Texture texture)
 	{
 		super(texture);
-		init();
+		init(direction, grid);
 	}
-	public Fish(Texture texture, Tile spawn)
+	public Fish(DirectionType direction, Grid grid, Texture texture, Tile spawn)
 	{
 		super(texture, spawn.getCenterX(), spawn.getCenterY());
-		init();
+		init(direction, grid);
 	}
-	
-	private void init()
+	private void init(DirectionType direction, Grid grid)
 	{
-		direction = Startdirection;
-		//direction = DirectionType.DIRECTION_UP;
+		this.grid = grid;
+		this.direction = direction;
 		hasCoin = false;
 	}
-	public int getXloc(Grid grid)
+	
+	public Tile getTile()
+	{
+		return grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
+	}
+	public int getXloc()
 	{
 		Tile t = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
 		if(t == null) return 0;
 		return t.getX();
 	}
-	public int getYloc(Grid grid)
+	public int getYloc()
 	{
 		Tile t = grid.getTile(sprite.getX(), Constants.HEIGHT - sprite.getY());
 		if(t == null) return 0;
@@ -52,13 +58,11 @@ public class Fish extends Entity
 	
 	public void update(float deltaTime, Grid grid) // tried to send grid, but grid never updates ////////////
 	{
-		collideTiles(grid);
+		super.update(deltaTime);
 		updateRotation();
 		updateVelocity(grid, deltaTime);
-		super.update(deltaTime);
+		collideTiles(deltaTime, grid);
 	}
-	
-	public static void changeSpawnDir(DirectionType eStartDirection) {Startdirection = eStartDirection;}
 
 	public void updateRotation()
 	{
@@ -145,7 +149,7 @@ public class Fish extends Entity
 	}
 	
 	// Fish checks tiles it could possibly collide with
-	public void collideTiles(Grid grid)
+	public void collideTiles(float deltaTime, Grid grid)
 	{
 		// getTile() works as expected now
 		// please be sure to do a null check "if(temp != null)" before doing any operations on stuff that could potentially be null
@@ -158,12 +162,7 @@ public class Fish extends Entity
 			//System.out.println(currentTile.getCenterX() + " " + currentTile.getCenterY() + " " + sprite.getX()  + " "+ sprite.getY() );
 			
 			// If we're near the center of the tile...
-			if (	
-					sprite.getX() + sprite.getWidth()/2 >= currentTile.getCenterX() - Constants.TILE_COLLIDE_BOX 	&&		// left side
-					sprite.getX() + sprite.getWidth()/2 <= currentTile.getCenterX() + Constants.TILE_COLLIDE_BOX 	&&		// right side
-					sprite.getY() + sprite.getHeight()/2 >= currentTile.getCenterY() - Constants.TILE_COLLIDE_BOX 	&&	// bottom side
-					sprite.getY() + sprite.getHeight()/2 <= currentTile.getCenterY() + Constants.TILE_COLLIDE_BOX		// top side
-				)
+			if (sprite.getBoundingRectangle().contains(new Rectangle( currentTile.getCenterX() - Constants.TILE_COLLIDE_BOX, currentTile.getCenterY() - Constants.TILE_COLLIDE_BOX, Constants.TILE_COLLIDE_BOX, Constants.TILE_COLLIDE_BOX)))
 			{
 				// If we hit a player gate tile, award that fish to the player
 				if(currentTile.getTileType() == TileType.TILE_PLAYER_GATE)
@@ -182,6 +181,7 @@ public class Fish extends Entity
 					{
 						currentTile.removeCoin();
 						setHasCoin(true);
+						GameLogic.changeNumAlgaeActive(-1);
 					}
 				}
 				
@@ -194,46 +194,20 @@ public class Fish extends Entity
 				
 				// Fish need to look ahead and prevent themselves from colliding with solid tiles
 				
-				Tile nextTile = null;
-				switch(direction)
-				{
-				case DIRECTION_UP:
-					nextTile = grid.getTile(currentTile.getX(),currentTile.getY() - 1);
-					if(nextTile != null)
-					{
-						if (!canMoveInto(nextTile))
-							turn(DirectionType.DIRECTION_RIGHT);
-					}
-					break;
-				case DIRECTION_RIGHT:
-					nextTile = grid.getTile(currentTile.getX() + 1,currentTile.getY());
-					if(nextTile != null)
-					{
-						if (!canMoveInto(nextTile))
-							turn(DirectionType.DIRECTION_RIGHT);
-					}
-					break;
-				case DIRECTION_DOWN:
-					nextTile = grid.getTile(currentTile.getX(),currentTile.getY() + 1);
-					if(nextTile != null)
-					{
-						if (!canMoveInto(nextTile))
-							turn(DirectionType.DIRECTION_RIGHT);
-					}
-					break;
-				case DIRECTION_LEFT:
-					nextTile = grid.getTile(currentTile.getX() - 1,currentTile.getY());
-					if(nextTile != null)
-					{
-						if (!canMoveInto(nextTile))
-							turn(DirectionType.DIRECTION_RIGHT);
-					}
-					break;
-				default:
-					break;
-				}
+				Tile nextTile = grid.getTileInDirection(currentTile, direction);
+				if(!canMoveInto(nextTile))
+					turn(DirectionType.DIRECTION_RIGHT);
+				
+				// bugfix: do it again!
+				nextTile = grid.getTileInDirection(currentTile, direction);
+				if(!canMoveInto(nextTile))
+					turn(DirectionType.DIRECTION_RIGHT);
 			}
 		}
+		// yeah we somehow ended out of the map. Kill us.
+		else
+		{
+			setDelayedDeath(true);
+		}
 	}
-	
 }

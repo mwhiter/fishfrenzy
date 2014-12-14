@@ -3,7 +3,9 @@ package objects;
 import java.util.ArrayList;
 
 
+
 import core.DirectionType;
+import core.GameLogic;
 import environment.Grid;
 import environment.Tile;
 
@@ -17,15 +19,17 @@ public class Player {
 	private int iScore;			// actual game score (could be different from fish captured
 	private int iCoins;			// number of coins we've collected
 	private Tile home;			// the home gate for this player
+	private PlayerAI ai;		// the AI. Every player has an AI but only humans will update.
 	
 	private DirectionType activeDirection;
-	ArrayList<Tile> tiles;
+	private ArrayList<Tile> tiles;
 	
 	// Constructor
-	public Player(int id, boolean bHuman)
+	public Player(GameLogic logic, int id, boolean bHuman)
 	{
 		this.id = id;
 		this.bHuman = bHuman;
+		this.ai = new PlayerAI(this, logic);
 		
 		home = null;
 		iScore = 0;
@@ -38,47 +42,26 @@ public class Player {
 	
 	// What does it mean to update a Player? Run its AI (this is called once per frame)
 	// Is this really the best thing to do? Maybe not...discuss at some point
-	public void update()
-	{
-		
-		// Don't update for humans because they make their own decisions
-		if(!isHuman()) 
-		{
-			return;
-		}
-		// ai stuff here...
-		
-		//if (GameLogic.mostFish() == 0)
-		//{
-			//Tile temp = new Tile (grid,DirectionType)
-		//}
+	public void update(Grid grid)
+	{		
+		ai.update(grid);
 	}
 	
 	public boolean isHuman()
 	{
 		return bHuman;
 	}
-	public void assignAITile(Grid grid, Tile tile,  DirectionType eDir)
-	{
-		if(grid == null) return;
-		if(tile == null) return;
-		if(tile.getDirection() == getActiveDirection()) return;
-		
-			tile.setTileDirection(this, eDir);
-			if (tiles.size() > 2)
-		    {
-				grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION );
-		     	tiles.remove(0);
-			}
-			tiles.add(tile);
-	}
-	
 	
 	public void assignTile(Grid grid, Tile tile)
 	{
 		if(grid == null) return;
 		if(tile == null) return;
-		if(tile.getDirection() == getActiveDirection()) return;
+		
+		// We tried to place a tile on a tile with a direction - kill it first
+		if(tile.getDirection() != DirectionType.NO_DIRECTION)
+		{
+			unassignTile(tile);
+		}
 		
 		// set the tile direction and then add it to our tiles list
 		// will return false if direction was not assigned
@@ -87,12 +70,23 @@ public class Player {
 			// If we've reached the maximum amount of tiles we're allowed, remove the first one
 			if (tiles.size() > 2)
 		    {
-				grid.getTile(tiles.get(0)).setTileDirection(this, DirectionType.NO_DIRECTION);
-		     	tiles.remove(0);
+				unassignTile(tiles.get(0));
 			}
 			
 			tiles.add(tile);
+			tile.setDirectionSetter(this);
 		}
+	}
+	
+	public void unassignTile(Tile tile)
+	{
+		Player owner = tile.getDirectionSetter();
+
+		ArrayList<Tile> owner_tiles = owner.getTiles();
+
+		tile.setTileDirection(this, DirectionType.NO_DIRECTION);
+		tile.setDirectionSetter(null);
+		owner_tiles.remove(tile);
 	}
 	
 	// Awards a fish to player. Set the fish to be killed next player and give him score
@@ -101,7 +95,7 @@ public class Player {
 		iFishCaptured++;
 		iScore++;
 		
-		System.out.println("Player " + id + " captured a fish (coin: " + fish.isHasCoin() + ")");
+		//System.out.println("Player " + id + " captured a fish (coin: " + fish.isHasCoin() + ")");
 		
 		if(fish.isHasCoin())
 		{
@@ -111,6 +105,7 @@ public class Player {
 		fish.setDelayedDeath(true);
 	}
 	
+	public int getID() { return id; }
 	public void setHome(Tile tile) { home = tile; }
 	public Tile getHome() { return home; }
 	public int getNumFishCaptured() { return iFishCaptured; }
@@ -118,6 +113,7 @@ public class Player {
 	public int getCoins()			{ return iCoins; }
 	//public void incTile()			{ tileAmmo ++; }
 	
+	public ArrayList<Tile> getTiles() { return tiles; }
 	public DirectionType getActiveDirection() { return activeDirection; }
 	public void setActiveDirection(DirectionType eDirection) { activeDirection = eDirection; }
 }

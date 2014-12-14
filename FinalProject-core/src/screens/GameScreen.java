@@ -84,6 +84,8 @@ public class GameScreen implements Screen, InputProcessor {
 	@Override
 	public boolean keyDown(int keyCode)
 	{
+		logic.processKeyboardInput(keyCode);
+		
 		return false;
 	}
 	
@@ -133,6 +135,8 @@ public class GameScreen implements Screen, InputProcessor {
 					return true;
 			}
 		}
+		
+		logic.processMouseInput(screenX, screenY, button);
 		
 		return false;
 	}
