@@ -30,5 +30,5 @@ public class Constants {
 	// TODO: difficulty speeds up these values
 	public final static int TIME_BETWEEN_AI_MOVE = 800;
 	
-	public final static int FISH_SPEED = 25000;						// speed of the fish
+	public final static int FISH_SPEED = 10000;						// speed of the fish  25000
 }

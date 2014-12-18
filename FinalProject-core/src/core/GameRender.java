@@ -37,7 +37,12 @@ public class GameRender {
 			drawScore(player, spriteBatch);
 		}
 		
+		
 		drawGame(spriteBatch);
+		if (GameLogic.checkGame() == true)
+		{
+		drawFinal(spriteBatch);
+		}
 		
 		spriteBatch.end();
 	}
@@ -94,5 +99,15 @@ public class GameRender {
 		font.draw(batch, sz1, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 24);
 		font.draw(batch, sz2, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() - 8);
 		font.draw(batch, sz3, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 8);
+	}
+	private void drawFinal(Batch batch)
+	{
+		BitmapFont font = new BitmapFont();
+		font.setColor(Color.WHITE);
+			
+		String sz1 = " GAMEOVER ";
+		
+		font.draw(batch, sz1,Constants.WIDTH/2, Constants.HEIGHT/2);
+	
 	}
 }

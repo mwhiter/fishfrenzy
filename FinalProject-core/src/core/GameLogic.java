@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -37,12 +38,14 @@ public class GameLogic {
 	private static long dbPowerTime = -1;
 	private static long fzPowerTime  = -1;
 	
-	
+	public static OrthographicCamera cam;
 	private DirectionType waveSpawnDirection;
 	
 	// Victory conditions
 	private int goalFish;
 	private long timeLimit;
+	
+	private static boolean gameover = false;
 	
 	// Constructor
 	public GameLogic()
@@ -76,63 +79,70 @@ public class GameLogic {
 		gameStartTime = TimeUtils.millis();
 		
 		waveSpawnDirection = DirectionType.NO_DIRECTION;
+		
+		cam = new OrthographicCamera(Constants.WIDTH,Constants.HEIGHT);
+		cam.update();
 	}
 	
 	public void update()
 	{	
 		// Fish spawn logic - pretty basic right now
-		doCreateFish();
-		doCreateAlgae();
-		checkDBPowerUp();
-		checkFZPowerUp();
-		// Update players
-		for(int i=0; i < players.size(); i++)
+		if (!gameover)
 		{
-			Player loopPlayer = players.get(i);
-			loopPlayer.update(grid);
-			//grid = loopPlayer.returnUpdatedGrid();
-		}
-		
-		deadIndices.clear();
-		
-		// Update the game objects
-		for(int i=0; i < gameObjects.size(); i++)
-		{
-			GameObject loopObject = gameObjects.get(i);
-			
-			// Object marked for death - no processing but kill it instead
-			if(loopObject.isDelayedDeath())
+			doCreateFish();
+			doCreateAlgae();
+			checkDBPowerUp();
+			checkFZPowerUp();
+			// Update players
+			for(int i=0; i < players.size(); i++)
 			{
-				if(loopObject instanceof Fish) changeNumFishActive(-1);
-				deadIndices.add(i);
+				Player loopPlayer = players.get(i);
+				loopPlayer.update(grid);
+				if (players.get(i).getScore()>= 2)gameover = true;
+				//grid = loopPlayer.returnUpdatedGrid();
 			}
-			else
+			
+			deadIndices.clear();
+			
+			// Update the game objects
+			for(int i=0; i < gameObjects.size(); i++)
 			{
-				if(loopObject.isUpdatable())
+				GameObject loopObject = gameObjects.get(i);
+				
+				// Object marked for death - no processing but kill it instead
+				if(loopObject.isDelayedDeath())
 				{
-					// Update fish
-					if (loopObject instanceof Fish)
+					if(loopObject instanceof Fish) changeNumFishActive(-1);
+					deadIndices.add(i);
+				}
+				else
+				{
+					if(loopObject.isUpdatable())
 					{
-						((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
+						// Update fish
+						if (loopObject instanceof Fish)
+						{
+							((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
+						}
+						// Update other objects
+						else
+							loopObject.update(Gdx.graphics.getDeltaTime());
 					}
-					// Update other objects
-					else
-						loopObject.update(Gdx.graphics.getDeltaTime());
 				}
 			}
-		}
-		
-		for(Integer index : deadIndices)
-		{	
-			try
-			{
-				@SuppressWarnings("unused")
-				GameObject dead = gameObjects.remove((int)index);
-				dead = null;
-			}
-			catch(IndexOutOfBoundsException e)
-			{
-				System.out.println("Tried to delete an object with index " + index);
+			
+			for(Integer index : deadIndices)
+			{	
+				try
+				{
+					@SuppressWarnings("unused")
+					GameObject dead = gameObjects.remove((int)index);
+					dead = null;
+				}
+				catch(IndexOutOfBoundsException e)
+				{
+					System.out.println("Tried to delete an object with index " + index);
+				}
 			}
 		}
 		//System.out.println(TopLeft +  " " + TopRight + " "  + BottomLeft  + " "  + BottomRight);
@@ -210,17 +220,17 @@ public class GameLogic {
 		
 		if (key == Input.Keys.R) 
 		{
-			//if (players.get(0).getCoins() >= 2)  
+			if (players.get(0).getCoins() >= 2)  
 			{players.get(0).useCoins(2);rmPowerUP();}
 		}
 		if (key == Input.Keys.T) 
 		{
-			//if (players.get(0).getCoins() >= 4)  
+			if (players.get(0).getCoins() >= 3)  
 			{players.get(0).useCoins(4);FZPowerUP();}
 		}
 		if (key == Input.Keys.Y) 
 		{
-			//if (players.get(0).getCoins() >= 6)  
+			if (players.get(0).getCoins() >= 4)  
 			{players.get(0).useCoins(6);dbPowerUP();}
 		}
 		
@@ -368,6 +378,8 @@ public class GameLogic {
 	
 	public int getGoalFish() { return goalFish; }
 	public void setGoalFish(int iValue) { goalFish = Math.max(0, iValue); }
+	
+	public static boolean checkGame() {return gameover;}
 	
 	public long getTimeElapsedInGame() { return TimeUtils.millis() - gameStartTime; }
 	public long getTimeRemaining() { return Math.max(0, timeLimit - getTimeElapsedInGame()); }
