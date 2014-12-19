@@ -28,13 +28,13 @@ public class GameScreen implements Screen, InputProcessor {
 	public GameLogic getLogic() { return logic; }
 	public GameRender getRender() { return render; }
 	
-	public GameScreen(Core game)
+	public GameScreen(long timeLimit, Core game)
 	{
 		super();
 		this.game = game;
 		ui_elements = new ArrayList<UIElement>();
 		
-		logic 	= new GameLogic(10000);
+		logic 	= new GameLogic(timeLimit);
 		render 	= new GameRender(logic);
 		
 		ambience = Gdx.audio.newMusic(Gdx.files.internal("music/ambience.ogg"));

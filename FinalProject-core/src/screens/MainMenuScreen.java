@@ -21,13 +21,16 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	private Texture title;
 	private ArrayList<UIElement> ui_elements;
 	
+	private long timeLimit;
+	
 	public MainMenuScreen(Core game)
 	{
 		super();
 		this.game = game;
 		
 		spriteBatch = new SpriteBatch();
-
+		timeLimit = 60000;
+		
 		ui_elements = new ArrayList<UIElement>();
 	}
 	
@@ -47,7 +50,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		startGame.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new GameScreen(game));
+				game.setScreen(new GameScreen(timeLimit, game));
 				dispose();
 			}
 		});
