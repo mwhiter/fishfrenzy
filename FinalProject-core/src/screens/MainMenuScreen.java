@@ -18,6 +18,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	Core game;
 	private SpriteBatch spriteBatch;
 	private Texture background;
+	private Texture title;
 	private ArrayList<UIElement> ui_elements;
 	
 	public MainMenuScreen(Core game)
@@ -32,19 +33,29 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	
 	private void InitMenuButtons()
 	{
-		ui_elements.add(new UIElement("Start Game!", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 0, 140, 48));	// Start Game
-		ui_elements.add(new UIElement("Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));	// Options
-		ui_elements.add(new UIElement("Exit", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));	// End Game
+		ui_elements.add(new UIElement("Start Game!", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 0, 140, 48));		// Start Game
+		ui_elements.add(new UIElement("How to play", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));	// How to play
+		ui_elements.add(new UIElement("Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));		// Options
+		ui_elements.add(new UIElement("Exit", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 192, 140, 48));			// End Game
 		
 		UIElement startGame = ui_elements.get(0);
-		UIElement options = ui_elements.get(1);
-		UIElement endGame = ui_elements.get(2);
+		UIElement howToPlay = ui_elements.get(1);
+		UIElement options = ui_elements.get(2);
+		UIElement endGame = ui_elements.get(3);
 		
 		// Start Game button
 		startGame.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
 				game.setScreen(new GameScreen(game));
+				dispose();
+			}
+		});
+		
+		howToPlay.setCallbackFunction(new CallbackFunction() {
+			public void func()
+			{
+				game.setScreen(new HowToPlayScreen(game));
 				dispose();
 			}
 		});
@@ -73,6 +84,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		spriteBatch.begin();
 		spriteBatch.draw(background, 0, 0);
+		spriteBatch.draw(title, 280, Constants.HEIGHT - 200);
 		for(UIElement element : ui_elements)
 		{
 			element.draw(spriteBatch);
@@ -89,6 +101,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	@Override
 	public void show()
 	{
+		title = new Texture("images/logo.png");
 		background = new Texture("images/background.jpg");
 		InitMenuButtons();
 		Gdx.input.setInputProcessor(this);
