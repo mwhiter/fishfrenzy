@@ -62,7 +62,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		endGame.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				
+				Gdx.app.exit();
 			}
 		});
 	}

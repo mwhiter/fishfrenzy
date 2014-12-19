@@ -44,6 +44,11 @@ public class GameLogic {
 	private int goalFish;
 	private long timeLimit;
 	
+	// Time keeping
+	private long currentTime;
+	private long pauseStartedTime;
+	private long pauseEndedTime;
+	
 	private Player winner;
 	
 	// Constructor
@@ -63,7 +68,7 @@ public class GameLogic {
 		// Grid actually needs to know the players now so it has to come after they're initialized
 		grid = new Grid(this, "grids/grid0.txt");
 
-		gameStartTime = 0;
+		gameStartTime = TimeUtils.millis();
 		lastFishWaveSpawnTime = -1;
 		fishSpawnCount = 0;
 		numFishActive = 0;
@@ -79,6 +84,10 @@ public class GameLogic {
 		gameStartTime = TimeUtils.millis();
 		waveSpawnDirection = DirectionType.NO_DIRECTION;
 		
+		currentTime = 0;
+		pauseStartedTime = 0;
+		pauseEndedTime = 0;
+		
 		winner = null;
 		cam = new OrthographicCamera(Constants.WIDTH,Constants.HEIGHT);
 		cam.update();
@@ -86,6 +95,8 @@ public class GameLogic {
 	
 	public void update()
 	{
+		currentTime = getTimePauseStarted() + (TimeUtils.millis() - getTimePauseEnded());
+		
 		doCreateFish();
 		doCreateAlgae();
 		
@@ -428,9 +439,20 @@ public class GameLogic {
 	
 	public Player getWinner() { return winner; }
 	
+	public void setTimePauseStarted(long time) { pauseStartedTime = time; }
+	public long getTimePauseStarted() { return pauseStartedTime; }
+	
+	public void setTimePauseEnded(long time) { pauseEndedTime = time; }
+	public long getTimePauseEnded() { return pauseEndedTime; }
+	
+	public long getPauseDuration() { return getTimePauseEnded() - getTimePauseStarted(); }
+	
 	public int getGoalFish() { return goalFish; }
 	public void setGoalFish(int iValue) { goalFish = Math.max(0, iValue); }
 	
-	public long getTimeElapsedInGame() { return TimeUtils.millis() - gameStartTime; }
+	public void setCurrentTime(long newTime) { currentTime = newTime;}
+	public long getCurrentTime() { return currentTime; }
+	
+	public long getTimeElapsedInGame() { return currentTime - gameStartTime; }
 	public long getTimeRemaining() { return Math.max(0, timeLimit - getTimeElapsedInGame()); }
 }

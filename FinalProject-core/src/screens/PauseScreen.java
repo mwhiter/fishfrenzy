@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import core.Core;
 import core.GameRender;
@@ -13,12 +14,18 @@ public class PauseScreen implements Screen, InputProcessor {
 	private GameScreen gameScreen;
 	private GameRender render;
 	
+	private long started;
+	private long ended;
+	
 	public PauseScreen(Core game, GameRender render, GameScreen gameScreen)
 	{
 		super();
 		this.game = game;
 		this.gameScreen = gameScreen;
 		this.render = render;
+		
+		started = 0;
+		ended = 0;
 	}
 	
 	@Override
@@ -34,6 +41,8 @@ public class PauseScreen implements Screen, InputProcessor {
 		{
 		case 'p':
 		case 'P':
+			ended = TimeUtils.millis();
+			gameScreen.getLogic().setTimePauseEnded(gameScreen.getLogic().getCurrentTime() + (ended - started));
 			game.setScreen(gameScreen);
 			break;
 		}
@@ -115,6 +124,8 @@ public class PauseScreen implements Screen, InputProcessor {
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(this);
+		gameScreen.getLogic().setTimePauseStarted(gameScreen.getLogic().getCurrentTime());
+		started = TimeUtils.millis();
 	}
 
 }

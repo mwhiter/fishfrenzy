@@ -13,7 +13,7 @@ import environment.TileType;
 // Fish class. Extends the entity.
 // Fish spawn from the center and move in a certain direction.
 public class Fish extends Entity
-{
+{	
 	Grid grid;
 	DirectionType direction;
 	private boolean hasCoin;
