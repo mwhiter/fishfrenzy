@@ -13,6 +13,12 @@ public class Entity extends GameObject
 {	
 	protected Vector2 velocity;
 	
+	// empty constructor for the fish
+	public Entity()
+	{
+		
+	}
+	
 	public Entity(Texture texture)
 	{
 		sprite = new Sprite(texture);

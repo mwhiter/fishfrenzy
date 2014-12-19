@@ -39,10 +39,6 @@ public class GameRender {
 		
 		
 		drawGame(spriteBatch);
-		if (GameLogic.checkGame() == true)
-		{
-		drawFinal(spriteBatch);
-		}
 		
 		spriteBatch.end();
 	}
@@ -73,7 +69,7 @@ public class GameRender {
 		BitmapFont font = new BitmapFont();
 		
 		String szTime = "Time Remaining: " + getTimeString(logic.getTimeRemaining());
-		String szFish = "Fish Left: " + logic.getPlayerMostFish().getNumFishCaptured() + " (Player " + (logic.getPlayerMostFish().getID()+1) + ")/ MAX_FISH";
+		String szFish = "Fish Left: " + logic.getPlayerMostFish().getNumFishCaptured() + " (Player " + (logic.getPlayerMostFish().getID()+1) + ") / " + logic.getGoalFish();
 		
 		/*
 		Float deltaTime = Gdx.graphics.getDeltaTime();
@@ -97,17 +93,45 @@ public class GameRender {
 		String sz3 = player.getNumFishCaptured() + " Fish";
 		
 		font.draw(batch, sz1, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 24);
-		font.draw(batch, sz2, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() - 8);
-		font.draw(batch, sz3, player.getHome().getCenterX() - (font.getBounds(sz1).width / 2), player.getHome().getCenterY() + 8);
+		font.draw(batch, sz2, player.getHome().getCenterX() - (font.getBounds(sz2).width / 2), player.getHome().getCenterY() - 8);
+		font.draw(batch, sz3, player.getHome().getCenterX() - (font.getBounds(sz3).width / 2), player.getHome().getCenterY() + 8);
 	}
-	private void drawFinal(Batch batch)
+	
+	public void renderGameOver()
+	{
+		spriteBatch.begin();
+		
+		// Draw the grid
+		logic.getGrid().draw(spriteBatch);
+		
+		// Draw game objects
+		for(GameObject obj : logic.getGameObjects()){
+			if(obj.isDrawable())
+				obj.sprite.draw(spriteBatch);
+		}
+		
+		for(Player player : logic.getPlayers()){
+			drawScore(player, spriteBatch);
+		}
+		
+		
+		drawGame(spriteBatch);
+		drawGameOver(spriteBatch);
+		
+		spriteBatch.end();
+	}
+	
+	private void drawGameOver(Batch batch)
 	{
 		BitmapFont font = new BitmapFont();
 		font.setColor(Color.WHITE);
-			
-		String sz1 = " GAMEOVER ";
+		font.setScale(2.0f);
+		String sz1 = "GAME OVER!";
+		String sz2 = "Player " + (logic.getWinner().getID()+1) + " wins!";
+		String sz3 = "Press any key to continue.";
 		
-		font.draw(batch, sz1,Constants.WIDTH/2, Constants.HEIGHT/2);
-	
+		font.draw(batch, sz1, Constants.WIDTH/2 - (font.getBounds(sz1).width / 2), Constants.HEIGHT/2);
+		font.draw(batch, sz2, Constants.WIDTH/2 - (font.getBounds(sz2).width / 2), Constants.HEIGHT/2 - 50);
+		font.draw(batch, sz3, Constants.WIDTH/2 - (font.getBounds(sz3).width / 2), Constants.HEIGHT/2 - 80);
 	}
 }

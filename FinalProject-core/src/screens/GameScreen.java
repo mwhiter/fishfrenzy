@@ -10,6 +10,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 
+import screens.GameOverScreen;
 import core.Core;
 import core.GameLogic;
 import core.GameRender;
@@ -24,13 +25,16 @@ public class GameScreen implements Screen, InputProcessor {
 	
 	private ArrayList<UIElement> ui_elements;
 	
+	public GameLogic getLogic() { return logic; }
+	public GameRender getRender() { return render; }
+	
 	public GameScreen(Core game)
 	{
 		super();
 		this.game = game;
 		ui_elements = new ArrayList<UIElement>();
 		
-		logic 	= new GameLogic();
+		logic 	= new GameLogic(10000);
 		render 	= new GameRender(logic);
 		
 		ambience = Gdx.audio.newMusic(Gdx.files.internal("music/ambience.ogg"));
@@ -40,7 +44,16 @@ public class GameScreen implements Screen, InputProcessor {
 	public void render(float deltaTime)
 	{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		logic.update();
+		
+		if(logic.getWinner() == null)
+		{
+			logic.update();
+		}
+		else
+		{
+			game.setScreen(new GameOverScreen(game, this));
+		}
+		
 		render.render();
 	}
 	

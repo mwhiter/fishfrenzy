@@ -15,7 +15,6 @@ import objects.Fish;
 import environment.Grid;
 import environment.Tile;
 
-
 public class GameLogic {
 	
 	private static Grid grid;
@@ -45,11 +44,11 @@ public class GameLogic {
 	private int goalFish;
 	private long timeLimit;
 	
-	private static boolean gameover = false;
+	private Player winner;
 	
 	// Constructor
-	public GameLogic()
-	{		
+	public GameLogic(long timeLimit)
+	{
 		// create players and entities
 		players = new ArrayList<Player>();
 		gameObjects = new ArrayList<GameObject>();
@@ -74,77 +73,80 @@ public class GameLogic {
 		numAlgaeActive = 0;
 
 		// TODO: Test victory conditions values! Fix it!
-		goalFish = 200;		// 200 fish to capture
-		timeLimit = 60000;	// 60 ms time limit
-		gameStartTime = TimeUtils.millis();
+		goalFish = 200;					// 200 fish to capture
+		this.timeLimit = timeLimit;
 		
+		gameStartTime = TimeUtils.millis();
 		waveSpawnDirection = DirectionType.NO_DIRECTION;
 		
+		winner = null;
 		cam = new OrthographicCamera(Constants.WIDTH,Constants.HEIGHT);
 		cam.update();
 	}
 	
 	public void update()
-	{	
-		// Fish spawn logic - pretty basic right now
-		if (!gameover)
+	{
+		doCreateFish();
+		doCreateAlgae();
+		
+		checkDBPowerUp();
+		checkFZPowerUp();
+		
+		// Check victory conditions
+		if(checkVictory())
+			return;
+		
+		// Update players
+		for(int i=0; i < players.size(); i++)
 		{
-			doCreateFish();
-			doCreateAlgae();
-			checkDBPowerUp();
-			checkFZPowerUp();
-			// Update players
-			for(int i=0; i < players.size(); i++)
+			Player loopPlayer = players.get(i);
+			loopPlayer.update(grid);
+			//grid = loopPlayer.returnUpdatedGrid();
+		}
+		
+		deadIndices.clear();
+		
+		// Update the game objects
+		for(int i=0; i < gameObjects.size(); i++)
+		{
+			GameObject loopObject = gameObjects.get(i);
+			
+			// Object marked for death - no processing but kill it instead
+			if(loopObject.isDelayedDeath())
 			{
-				Player loopPlayer = players.get(i);
-				loopPlayer.update(grid);
-				if (players.get(i).getScore()>= 2)gameover = true;
-				//grid = loopPlayer.returnUpdatedGrid();
+				if(loopObject instanceof Fish) changeNumFishActive(-1);
+				deadIndices.add(i);
 			}
-			
-			deadIndices.clear();
-			
-			// Update the game objects
-			for(int i=0; i < gameObjects.size(); i++)
+			else
 			{
-				GameObject loopObject = gameObjects.get(i);
-				
-				// Object marked for death - no processing but kill it instead
-				if(loopObject.isDelayedDeath())
+				if(loopObject.isUpdatable())
 				{
-					if(loopObject instanceof Fish) changeNumFishActive(-1);
-					deadIndices.add(i);
-				}
-				else
-				{
-					if(loopObject.isUpdatable())
+					// Update fish
+					if (loopObject instanceof Fish)
 					{
-						// Update fish
-						if (loopObject instanceof Fish)
-						{
-							((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
-						}
-						// Update other objects
-						else
-							loopObject.update(Gdx.graphics.getDeltaTime());
+						((Fish) loopObject).update(Gdx.graphics.getDeltaTime(), grid);
 					}
-				}
-			}
-			
-			for(Integer index : deadIndices)
-			{	
-				try
-				{
-					@SuppressWarnings("unused")
-					GameObject dead = gameObjects.remove((int)index);
-					dead = null;
-				}
-				catch(IndexOutOfBoundsException e)
-				{
-					System.out.println("Tried to delete an object with index " + index);
+					// Update other objects
+					else
+						loopObject.update(Gdx.graphics.getDeltaTime());
 				}
 			}
 		}
+		
+		for(Integer index : deadIndices)
+		{	
+			try
+			{
+				@SuppressWarnings("unused")
+				GameObject dead = gameObjects.remove((int)index);
+				dead = null;
+			}
+			catch(IndexOutOfBoundsException e)
+			{
+				System.out.println("Tried to delete an object with index " + index);
+			}
+		}
+		
 		//System.out.println(TopLeft +  " " + TopRight + " "  + BottomLeft  + " "  + BottomRight);
 		//System.out.println(mostFish() + "Has the most fish");
 		//AIinput();
@@ -198,6 +200,57 @@ public class GameLogic {
 		}
 	}
 	
+	private boolean checkVictory()
+	{
+		Player winner = null;
+		
+		// Time limit
+		if(getTimeRemaining() == 0)
+		{
+			int highestCount = -1;
+			// Highest score
+			// Loop through all the players
+			for(int i=0; i < players.size(); i++)
+			{
+				if (players.get(i).getScore() > highestCount)
+				{
+					winner = players.get(i);
+				}
+				// tie at the highest
+				else if(players.get(i).getScore() == highestCount)
+				{
+					winner = null;
+				}
+			}
+			
+			// someone has to win (for now)
+			if(winner == null)
+				winner = players.get(0);
+		}
+		// See if anyone has captured the max fish
+		else
+		{
+			// Loop through all the players
+			for(int i=0; i < players.size(); i++)
+			{
+				if (players.get(i).getScore() >= goalFish)
+				{
+					winner = players.get(i);
+					break;
+				}
+			}
+		}
+		
+		// We have a winner! (or time ran out...)
+		if(winner != null)
+		{
+			this.winner = winner;
+			return true;
+		}
+		
+		return false;
+	}
+	
 	private void pickNewFishDirection()
 	{
 		int newDirection = MathUtils.random(0, 3);
@@ -233,9 +286,6 @@ public class GameLogic {
 			if (players.get(0).getCoins() >= 4)  
 			{players.get(0).useCoins(6);dbPowerUP();}
 		}
-		
-		
-		
 	}
 	
 	public void processMouseInput(float screenX, float screenY, int button)
@@ -376,10 +426,10 @@ public class GameLogic {
 		}
 	}
 	
+	public Player getWinner() { return winner; }
+	
 	public int getGoalFish() { return goalFish; }
 	public void setGoalFish(int iValue) { goalFish = Math.max(0, iValue); }
-	
-	public static boolean checkGame() {return gameover;}
 	
 	public long getTimeElapsedInGame() { return TimeUtils.millis() - gameStartTime; }
 	public long getTimeRemaining() { return Math.max(0, timeLimit - getTimeElapsedInGame()); }

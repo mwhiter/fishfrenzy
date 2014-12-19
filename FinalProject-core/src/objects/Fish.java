@@ -65,7 +65,7 @@ public class Fish extends Entity
 	}
 
 	public void updateRotation()
-	{
+	{	
 		switch(direction)
 		{
 		case DIRECTION_UP: 		sprite.setRotation(0); break;
