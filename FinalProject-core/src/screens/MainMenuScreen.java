@@ -5,8 +5,12 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import core.Constants;
@@ -21,6 +25,8 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	private Texture title;
 	private ArrayList<UIElement> ui_elements;
 	
+	private Music music;
+	
 	private long timeLimit;
 	
 	public MainMenuScreen(Core game)
@@ -29,27 +35,34 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		this.game = game;
 		
 		spriteBatch = new SpriteBatch();
-		timeLimit = 60000;
+		timeLimit = 120000;
+		
+		music = Gdx.audio.newMusic(Gdx.files.internal("music/mainmenu.ogg"));
+		music.setLooping(true);
+		music.play();
 		
 		ui_elements = new ArrayList<UIElement>();
 	}
 	
 	private void InitMenuButtons()
 	{
-		ui_elements.add(new UIElement("Start Game!", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 0, 140, 48));		// Start Game
-		ui_elements.add(new UIElement("How to play", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));	// How to play
-		ui_elements.add(new UIElement("Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));		// Options
-		ui_elements.add(new UIElement("Exit", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 192, 140, 48));			// End Game
+		ui_elements.add(new UIElement("Start Game!", 100, 250, 250, 100));		// Start Game
+		ui_elements.add(new UIElement("How to play", 100, 100, 250, 100));	// How to play
+		ui_elements.add(new UIElement("Options", 450, 250, 250, 100));		// Options
+		ui_elements.add(new UIElement("Exit", 450, 100, 250, 100));			// End Game
 		
 		UIElement startGame = ui_elements.get(0);
 		UIElement howToPlay = ui_elements.get(1);
 		UIElement options = ui_elements.get(2);
 		UIElement endGame = ui_elements.get(3);
 		
+		final MainMenuScreen thisMenu = this;
+		
 		// Start Game button
 		startGame.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
+				music.stop();
 				game.setScreen(new GameScreen(timeLimit, game));
 				dispose();
 			}
@@ -58,8 +71,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		howToPlay.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new HowToPlayScreen(game));
-				dispose();
+				game.setScreen(new HowToPlayScreen(thisMenu, game));
 			}
 		});
 		
@@ -67,8 +79,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		options.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new OptionsScreen(game));
-				dispose();
+				game.setScreen(new OptionsScreen(thisMenu, game));
 			}
 		});
 		
@@ -88,11 +99,26 @@ public class MainMenuScreen implements Screen, InputProcessor {
 		spriteBatch.begin();
 		spriteBatch.draw(background, 0, 0);
 		spriteBatch.draw(title, 280, Constants.HEIGHT - 200);
+		drawTextWithShadow(spriteBatch, "Group C", 420, 430, 1, true);
 		for(UIElement element : ui_elements)
 		{
 			element.draw(spriteBatch);
 		}
 		spriteBatch.end();
+	}
+	
+	private void drawTextWithShadow(Batch batch, String text, float x, float y, int shadowOffset, boolean centered)
+	{
+		float centerOffsetX = 0;
+		BitmapFont font = new BitmapFont();
+		
+		if(centered) centerOffsetX = font.getBounds(text).width / 2;
+		
+		font.setColor(Color.BLACK);
+		font.draw(batch, text, x - centerOffsetX - shadowOffset, y - shadowOffset);
+		
+		font.setColor(Color.WHITE);
+		font.draw(batch, text, x - centerOffsetX, y);
 	}
 	
 	@Override
@@ -131,7 +157,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 	@Override
 	public void dispose()
 	{
-		
+		music.dispose();
 	}
 	
 	@Override

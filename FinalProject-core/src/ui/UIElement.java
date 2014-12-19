@@ -75,6 +75,7 @@ public class UIElement {
 	public void draw(Batch batch)
 	{
 		sprite.draw(batch);
-		font.draw(batch, text, getX() + 40, getY() + 24);
+		font.setScale(2);
+		font.draw(batch, text, (getX() + size_x / 2) - (font.getBounds(text).width / 2), (getY() + size_y / 2) + (font.getBounds(text).height / 2));
 	}
 }

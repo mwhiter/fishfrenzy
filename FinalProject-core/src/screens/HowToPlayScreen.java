@@ -23,11 +23,13 @@ public class HowToPlayScreen implements InputProcessor, Screen {
 	private SpriteBatch spriteBatch;
 	private Texture background;
 	private ArrayList<UIElement> ui_elements;
+	private MainMenuScreen menu;
 	
-	public HowToPlayScreen(Core game)
+	public HowToPlayScreen(MainMenuScreen menu, Core game)
 	{
 		super();
 		this.game = game;
+		this.menu = menu;
 		spriteBatch = new SpriteBatch();
 		ui_elements = new ArrayList<UIElement>();
 	}
@@ -39,7 +41,7 @@ public class HowToPlayScreen implements InputProcessor, Screen {
 		ui_elements.get(0).setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new MainMenuScreen(game));
+				game.setScreen(menu);
 				dispose();
 			}
 		});
@@ -84,6 +86,9 @@ public class HowToPlayScreen implements InputProcessor, Screen {
 		String sz4 = "W (up), A (left), S (down), D (right) keys will select a direction. Then click on the tile you want to place the arrow.";
 		String sz5 = "You can only place an arrow on an empty tile, and it can't lead the fish into a solid wall.";
 		String sz6 = "The winner is the player with the most fish after time runs out (or you hit the goal amount of fish).";
+		String sz7 = "Coins appear on the map. If a fish swims over the coins, it will collect it. Capture this fish and you will capture the coin!";
+		String sz8 = "Coins can be used to activate powerups.";
+		String sz9 = "R (2 Coins - Remove Enemy Arrow), T (4 Coins - Freeze Enemy), Y (6 Coins - Double Score)";
 				
 		drawTextWithShadow(batch, sz1, Constants.WIDTH/2.0f, Constants.HEIGHT - 96.0f, 1, true);
 		drawTextWithShadow(batch, sz2, Constants.WIDTH/2.0f, Constants.HEIGHT - 128.0f, 1, true);
@@ -91,6 +96,9 @@ public class HowToPlayScreen implements InputProcessor, Screen {
 		drawTextWithShadow(batch, sz4, Constants.WIDTH/2.0f, Constants.HEIGHT - 176.0f, 1, true);
 		drawTextWithShadow(batch, sz5, Constants.WIDTH/2.0f, Constants.HEIGHT - 208.0f, 1, true);
 		drawTextWithShadow(batch, sz6, Constants.WIDTH/2.0f, Constants.HEIGHT - 240.0f, 1, true);
+		drawTextWithShadow(batch, sz7, Constants.WIDTH/2.0f, Constants.HEIGHT - 272.0f, 1, true);
+		drawTextWithShadow(batch, sz8, Constants.WIDTH/2.0f, Constants.HEIGHT - 304.0f, 1, true);
+		drawTextWithShadow(batch, sz9, Constants.WIDTH/2.0f, Constants.HEIGHT - 320.0f, 1, true);
 	}
 	
 	private void drawTextWithShadow(Batch batch, String text, float x, float y, int shadowOffset, boolean centered)

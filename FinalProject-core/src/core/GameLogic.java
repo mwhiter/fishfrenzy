@@ -77,7 +77,7 @@ public class GameLogic {
 		algaeSpawnCount = 0;
 		numAlgaeActive = 0;
 
-		goalFish = 50;					
+		goalFish = 120;					
 		this.timeLimit = timeLimit;
 		
 		gameStartTime = TimeUtils.millis();
@@ -285,17 +285,26 @@ public class GameLogic {
 		if (key == Input.Keys.R) 
 		{
 			if (players.get(0).getCoins() >= 2)  
-			{players.get(0).useCoins(2);rmPowerUP();}
+			{
+				players.get(0).useCoins(2);
+				rmPowerUP();
+			}
 		}
 		if (key == Input.Keys.T) 
 		{
 			if (players.get(0).getCoins() >= 3)  
-			{players.get(0).useCoins(4);FZPowerUP();}
+			{
+				players.get(0).useCoins(4);
+				FZPowerUP();
+			}
 		}
 		if (key == Input.Keys.Y) 
 		{
 			if (players.get(0).getCoins() >= 4)  
-			{players.get(0).useCoins(6);dbPowerUP();}
+			{
+				players.get(0).useCoins(6);
+				dbPowerUP();
+			}
 		}
 	}
 	

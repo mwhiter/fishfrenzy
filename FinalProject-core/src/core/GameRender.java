@@ -52,9 +52,9 @@ public class GameRender {
 		ms %= 1000;
 		
 		Long seconds = time / 1000;
+		Long minutes = seconds / 60;
 		seconds %= 60;
 		
-		Long minutes = seconds / 60;
 		
 		if(time < 10000)
 			rtnString = minutes.toString() + ":" + seconds.toString() + ":" + ms.toString();
@@ -69,7 +69,7 @@ public class GameRender {
 		BitmapFont font = new BitmapFont();
 		
 		String szTime = "Time Remaining: " + getTimeString(logic.getTimeRemaining());
-		String szFish = "Fish Left: " + logic.getPlayerMostFish().getNumFishCaptured() + " (Player " + (logic.getPlayerMostFish().getID()+1) + ") / " + logic.getGoalFish();
+		String szFish = "Fish Left: " + logic.getPlayerMostFish().getNumFishCaptured() + " (Player " + logic.getPlayerMostFish().getID() + ") / " + logic.getGoalFish();
 		
 		/*
 		Float deltaTime = Gdx.graphics.getDeltaTime();
@@ -88,7 +88,7 @@ public class GameRender {
 		BitmapFont font = new BitmapFont();
 		font.setColor(Color.WHITE);		
 		
-		String sz1 = "Player " + player.getID()+1;
+		String sz1 = "Player " + player.getID();
 		String sz2 = player.getCoins() + " Coins";
 		String sz3 = player.getNumFishCaptured() + " Fish";
 		

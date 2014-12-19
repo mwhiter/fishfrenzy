@@ -11,9 +11,9 @@ public class Constants {
 	
 	/* Spawning Fish */
 	public final static int FISH_DELAY = 3000;						// delay at start of game before fish can come out (in ms)
-	public final static int TIME_BETWEEN_FISH_WAVE_SPAWN = 4000;	// in ms, and probably shouldn't be a constant, because we might want to change this, time between group fish spawns
-	public final static int TIME_BETWEEN_FISH_SPAWN = 500;			// in ms, might be wise to keep this as a constant. Time between individual fish spawns // 100
-	public final static int FISH_SPAWN_WAVE_SIZE = 6;				// how many fish spawn during a wave  //15
+	public final static int TIME_BETWEEN_FISH_WAVE_SPAWN = 3000;	// in ms, and probably shouldn't be a constant, because we might want to change this, time between group fish spawns
+	public final static int TIME_BETWEEN_FISH_SPAWN = 350;			// in ms, might be wise to keep this as a constant. Time between individual fish spawns // 100
+	public final static int FISH_SPAWN_WAVE_SIZE = 8;				// how many fish spawn during a wave  //15
 	public final static int MAX_NUM_ACTIVE_FISH = 100;				// maximum amount of fish active at once
 	
 	/* Spawning Coins */

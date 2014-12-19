@@ -19,11 +19,13 @@ public class OptionsScreen implements Screen, InputProcessor {
 	private SpriteBatch spriteBatch;
 	private Texture background;
 	private ArrayList<UIElement> ui_elements;
+	private MainMenuScreen menu;
 	
-	public OptionsScreen(Core game)
+	public OptionsScreen(MainMenuScreen menu, Core game)
 	{
 		super();
 		this.game = game;
+		this.menu = menu;
 		
 		spriteBatch = new SpriteBatch();
 
@@ -33,7 +35,7 @@ public class OptionsScreen implements Screen, InputProcessor {
 	private void InitMenuButtons()
 	{
 		ui_elements.add(new UIElement("Unused", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 64, 140, 48));
-		ui_elements.add(new UIElement("Leave Options", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));		// Leave Options
+		ui_elements.add(new UIElement("Return", Constants.WIDTH/2 - 70, Constants.HEIGHT/2 - 128, 140, 48));
 		
 		UIElement unused = ui_elements.get(0);
 		UIElement leaveOptions = ui_elements.get(1);
@@ -47,7 +49,7 @@ public class OptionsScreen implements Screen, InputProcessor {
 		leaveOptions.setCallbackFunction(new CallbackFunction() {
 			public void func()
 			{
-				game.setScreen(new MainMenuScreen(game));
+				game.setScreen(menu);
 				dispose();
 			}
 		});
