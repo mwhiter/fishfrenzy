@@ -8,6 +8,7 @@ import ui.UIElement;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -76,22 +77,34 @@ public class HowToPlayScreen implements InputProcessor, Screen {
 	}
 	
 	public void renderText(Batch batch)
-	{
-		BitmapFont font = new BitmapFont();
-		
+	{	
 		String sz1 = "Welcome to Fish Frenzy!";
 		String sz2 = "The objective of the game is to lead the fish into your home base (Bottom left for Player 1, Bottom right for Player 2).";
 		String sz3 = "In order to do this, you must place arrows on the grid in order to guide them home!";
 		String sz4 = "W (up), A (left), S (down), D (right) keys will select a direction. Then click on the tile you want to place the arrow.";
 		String sz5 = "You can only place an arrow on an empty tile, and it can't lead the fish into a solid wall.";
 		String sz6 = "The winner is the player with the most fish after time runs out (or you hit the goal amount of fish).";
+				
+		drawTextWithShadow(batch, sz1, Constants.WIDTH/2.0f, Constants.HEIGHT - 96.0f, 1, true);
+		drawTextWithShadow(batch, sz2, Constants.WIDTH/2.0f, Constants.HEIGHT - 128.0f, 1, true);
+		drawTextWithShadow(batch, sz3, Constants.WIDTH/2.0f, Constants.HEIGHT - 144.0f, 1, true);
+		drawTextWithShadow(batch, sz4, Constants.WIDTH/2.0f, Constants.HEIGHT - 176.0f, 1, true);
+		drawTextWithShadow(batch, sz5, Constants.WIDTH/2.0f, Constants.HEIGHT - 208.0f, 1, true);
+		drawTextWithShadow(batch, sz6, Constants.WIDTH/2.0f, Constants.HEIGHT - 240.0f, 1, true);
+	}
+	
+	private void drawTextWithShadow(Batch batch, String text, float x, float y, int shadowOffset, boolean centered)
+	{
+		float centerOffsetX = 0;
+		BitmapFont font = new BitmapFont();
 		
-		font.draw(batch, sz1, Constants.WIDTH/2 - (font.getBounds(sz1).width / 2), Constants.HEIGHT - 32);
-		font.draw(batch, sz2, Constants.WIDTH/2 - (font.getBounds(sz2).width / 2), Constants.HEIGHT - 64);
-		font.draw(batch, sz3, Constants.WIDTH/2 - (font.getBounds(sz3).width / 2), Constants.HEIGHT - 96);
-		font.draw(batch, sz4, Constants.WIDTH/2 - (font.getBounds(sz4).width / 2), Constants.HEIGHT - 128);
-		font.draw(batch, sz5, Constants.WIDTH/2 - (font.getBounds(sz5).width / 2), Constants.HEIGHT - 144);
-		font.draw(batch, sz6, Constants.WIDTH/2 - (font.getBounds(sz6).width / 2), Constants.HEIGHT - 176);
+		if(centered) centerOffsetX = font.getBounds(text).width / 2;
+		
+		font.setColor(Color.BLACK);
+		font.draw(batch, text, x - centerOffsetX - shadowOffset, y - shadowOffset);
+		
+		font.setColor(Color.WHITE);
+		font.draw(batch, text, x - centerOffsetX, y);
 	}
 
 	@Override
