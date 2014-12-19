@@ -62,8 +62,8 @@ public class GameLogic {
 		deadIndices = new ArrayList<Integer>();
 		
 		// For now, just init two players - one human, one AI
-		players.add(new Player(this, 0, true));
-		players.add(new Player(this, 1, false));
+		players.add(new Player(this, 1, true));
+		players.add(new Player(this, 2, false));
 
 		// Grid actually needs to know the players now so it has to come after they're initialized
 		grid = new Grid(this, "grids/grid0.txt");
@@ -77,8 +77,7 @@ public class GameLogic {
 		algaeSpawnCount = 0;
 		numAlgaeActive = 0;
 
-		// TODO: Test victory conditions values! Fix it!
-		goalFish = 200;					// 200 fish to capture
+		goalFish = 50;					
 		this.timeLimit = timeLimit;
 		
 		gameStartTime = TimeUtils.millis();
@@ -226,6 +225,7 @@ public class GameLogic {
 				if (players.get(i).getScore() > highestCount)
 				{
 					winner = players.get(i);
+					highestCount = players.get(i).getScore();
 				}
 				// tie at the highest
 				else if(players.get(i).getScore() == highestCount)

@@ -22,6 +22,7 @@ public class GameScreen implements Screen, InputProcessor {
 	private GameRender render;
 	
 	Music ambience;
+	Music background;
 	
 	private ArrayList<UIElement> ui_elements;
 	
@@ -38,6 +39,10 @@ public class GameScreen implements Screen, InputProcessor {
 		render 	= new GameRender(logic);
 		
 		ambience = Gdx.audio.newMusic(Gdx.files.internal("music/ambience.ogg"));
+		background = Gdx.audio.newMusic(Gdx.files.internal("music/background.ogg"));
+		
+		ambience.setLooping(true);
+		background.setLooping(true);
 	}
 	
 	@Override
@@ -51,6 +56,9 @@ public class GameScreen implements Screen, InputProcessor {
 		}
 		else
 		{
+			background.stop();
+			ambience.stop();
+			
 			game.setScreen(new GameOverScreen(game, this));
 		}
 		
@@ -68,11 +76,13 @@ public class GameScreen implements Screen, InputProcessor {
 	{
 		Gdx.input.setInputProcessor(this);
 		ambience.play();
+		background.play();
 	}
 	
 	@Override
 	public void hide()
 	{
+		background.pause();
 		ambience.pause();
 	}
 	
@@ -92,6 +102,7 @@ public class GameScreen implements Screen, InputProcessor {
 	public void dispose()
 	{
 		ambience.dispose();
+		background.dispose();
 	}
 	
 	@Override

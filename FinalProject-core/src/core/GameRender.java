@@ -88,7 +88,7 @@ public class GameRender {
 		BitmapFont font = new BitmapFont();
 		font.setColor(Color.WHITE);		
 		
-		String sz1 = "Player " + (player.getID()+1);
+		String sz1 = "Player " + player.getID()+1;
 		String sz2 = player.getCoins() + " Coins";
 		String sz3 = player.getNumFishCaptured() + " Fish";
 		
@@ -127,7 +127,7 @@ public class GameRender {
 		font.setColor(Color.WHITE);
 		font.setScale(2.0f);
 		String sz1 = "GAME OVER!";
-		String sz2 = "Player " + (logic.getWinner().getID()+1) + " wins!";
+		String sz2 = "Player " + logic.getWinner().getID() + " wins!";
 		String sz3 = "Press any key to continue.";
 		
 		font.draw(batch, sz1, Constants.WIDTH/2 - (font.getBounds(sz1).width / 2), Constants.HEIGHT/2);
